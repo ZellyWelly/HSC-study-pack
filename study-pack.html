@@ -1,0 +1,719 @@
+<!DOCTYPE html><html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Trial HSC Study Pack — Week of 13 July</title>
+<style>
+  :root{
+    --ink:#1a1a2e; --muted:#5b6472; --line:#e3e7ee; --bg:#ffffff; --soft:#f6f8fb;
+    --red:#e4572e; --redbg:#fdeae4; --amber:#e0a100; --amberbg:#fcf3d6; --green:#2e9e5b; --greenbg:#e4f4ea;
+    --blue:#3a6ea5; --accent:#5b4b8a;
+    --dg:#1e7d3c; --lg:#6cc24a; --yl:#f4d03f; --or:#e88b1a; --rd:#e4572e;
+  }
+  *{box-sizing:border-box;}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    color:var(--ink); background:var(--soft); margin:0; line-height:1.55; -webkit-font-smoothing:antialiased;}
+  .wrap{max-width:940px; margin:0 auto; padding:32px 22px 80px;}
+  header.hero{background:linear-gradient(135deg,#5b4b8a,#3a6ea5); color:#fff; border-radius:16px;
+    padding:30px 32px; margin-bottom:8px;}
+  header.hero h1{margin:0 0 6px; font-size:1.7rem; letter-spacing:-.01em;}
+  header.hero p{margin:2px 0; opacity:.95; font-size:.97rem;}
+  .badges{margin-top:14px; display:flex; flex-wrap:wrap; gap:8px;}
+  .badge{background:rgba(255,255,255,.16); border:1px solid rgba(255,255,255,.28); padding:4px 11px;
+    border-radius:999px; font-size:.8rem; font-weight:600;}
+  section{background:var(--bg); border:1px solid var(--line); border-radius:14px; padding:24px 26px; margin-top:20px;}
+  h2{font-size:1.28rem; margin:0 0 4px; letter-spacing:-.01em;}
+  h2 .num{color:var(--accent); font-weight:800; margin-right:8px;}
+  h3{font-size:1.02rem; margin:20px 0 8px; color:var(--accent);}
+  .lead{color:var(--muted); margin:4px 0 16px; font-size:.95rem;}
+  p{margin:8px 0;}
+  ul{margin:8px 0 8px; padding-left:20px;} li{margin:5px 0;}
+  .chip{display:inline-block; font-size:.72rem; font-weight:700; padding:2px 9px; border-radius:999px; vertical-align:middle;}
+  .c-red{background:var(--redbg); color:var(--red);}
+  .c-amber{background:var(--amberbg); color:#9a7000;}
+  .c-green{background:var(--greenbg); color:var(--green);}
+  table{width:100%; border-collapse:collapse; margin:12px 0; font-size:.9rem;}
+  th,td{text-align:left; padding:9px 11px; border-bottom:1px solid var(--line); vertical-align:top;}
+  th{background:var(--soft); font-size:.78rem; text-transform:uppercase; letter-spacing:.04em; color:var(--muted);}
+  tr:last-child td{border-bottom:none;}
+  .prio{white-space:nowrap; width:1%;}
+  .youcol{white-space:nowrap; width:1%; text-align:center;}
+  .det{color:var(--muted); font-size:.82rem; font-weight:400;}
+  tr.mod td{background:#e6e2f2; font-weight:800; font-size:.74rem; text-transform:uppercase; letter-spacing:.05em; color:var(--accent); padding:8px 11px;}
+  tr.grp td{background:#f5f6fa; font-weight:600; font-size:.85rem; text-transform:none; letter-spacing:0; color:var(--accent); padding:6px 11px;}
+  .tag{display:inline-block; font-size:.7rem; font-weight:700; padding:2px 8px; border-radius:6px; color:#fff; white-space:nowrap;}
+  .t-bio{background:#2e9e5b;} .t-hms{background:#e4572e;} .t-eng{background:#3a6ea5;} .t-va{background:#a1489c;}
+  .t-rest{background:#8a94a6;} .t-mix{background:#5b4b8a;} .t-move{background:#16a085;} .t-star{background:#d68910;}
+  .callout{background:var(--soft); border-left:4px solid var(--accent); border-radius:0 10px 10px 0; padding:12px 16px; margin:14px 0; font-size:.92rem;}
+  .callout.warn{border-left-color:var(--amber); background:var(--amberbg);}
+  .grid2{display:grid; grid-template-columns:1fr 1fr; gap:14px;}
+  .mini{border:1px solid var(--line); border-radius:10px; padding:14px 16px; background:#fff;}
+  .mini h4{margin:0 0 6px; font-size:.95rem;}
+  .checkrow{display:flex; align-items:flex-start; gap:11px; padding:8px 0; border-bottom:1px dashed var(--line); font-size:.9rem;}
+  .checkrow:last-child{border-bottom:none;}
+  .day{margin-top:16px; border:1px solid var(--line); border-radius:12px; overflow:hidden;}
+  .day.flex .day-head{background:var(--amberbg);}
+  .day.off .day-head{background:#eceff3; color:var(--muted);}
+  .day-head{display:flex; justify-content:space-between; align-items:center; padding:10px 16px; background:var(--soft); font-weight:700;}
+  .day-head .hrs{font-size:.8rem; color:var(--muted); font-weight:600;}
+  tr.tguide td{background:#eef4ff; color:var(--accent); font-size:.8rem; font-weight:600; padding:8px 16px; line-height:1.5;}
+  .day table{margin:0;} .day td{padding:10px 16px;}
+  .time{white-space:nowrap; color:var(--muted); font-size:.82rem; width:1%; font-variant-numeric:tabular-nums;}
+  .time .clock{display:block; color:var(--accent); font-weight:700; margin-top:1px;}
+  .subj{white-space:nowrap; width:1%;}
+  ol.steps{margin:7px 0 2px; padding-left:18px;}
+  ol.steps li{margin:3px 0; font-size:.85rem; line-height:1.45;}
+  .rx{display:inline-block; background:#efe9f6; color:var(--accent); font-size:.68rem; font-weight:800; padding:1px 7px; border-radius:5px; letter-spacing:.02em; text-transform:uppercase; vertical-align:middle; margin-left:4px;}
+  .recipe{border:1px solid var(--line); border-radius:10px; padding:12px 15px; margin:10px 0; background:#fff;}
+  .recipe h4{margin:0 0 4px; font-size:.92rem;}
+  .recipe .letter{display:inline-block; background:var(--accent); color:#fff; font-weight:800; width:22px; height:22px; border-radius:6px; text-align:center; line-height:22px; margin-right:7px; font-size:.8rem;}
+  .recipe ol{margin:6px 0 0; padding-left:20px;} .recipe li{font-size:.87rem; margin:3px 0;}
+  .foot{color:var(--muted); font-size:.82rem; text-align:center; margin-top:28px;}
+  .legend{display:flex; flex-wrap:wrap; gap:14px; font-size:.82rem; color:var(--muted); margin-top:10px;}
+  .legend span{display:flex; align-items:center; gap:6px;}
+  .loop{display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin:14px 0;}
+  .loop .step{border:1px solid var(--line); border-radius:10px; padding:12px; background:var(--soft);}
+  .loop .step b{display:block; color:var(--accent); font-size:.95rem; margin-bottom:3px;}
+  .loop .step span{font-size:.83rem; color:var(--muted);}
+
+  /* interactive traffic-light tracker */
+  .tracker{background:linear-gradient(135deg,#eef4ff,#f6f1fb); border:1px solid var(--line);}
+  .tl{width:20px; height:20px; border-radius:50%; border:2px solid #cfd6e0; background:transparent; cursor:pointer; padding:0; vertical-align:middle; flex-shrink:0; transition:transform .08s;}
+  .tl:hover{transform:scale(1.18);}
+  .tl.set{border-color:rgba(0,0,0,.18);}
+  .tlkey{display:flex; flex-wrap:wrap; gap:14px; margin:10px 0 4px; font-size:.84rem;}
+  .tlkey span{display:flex; align-items:center; gap:7px;}
+  .sw{width:16px; height:16px; border-radius:50%; display:inline-block; border:1px solid rgba(0,0,0,.12);}
+  .sw.dg{background:var(--dg);} .sw.lg{background:var(--lg);} .sw.yl{background:var(--yl);} .sw.or{background:var(--or);} .sw.rd{background:var(--rd);}
+  #tally{font-size:.86rem; color:var(--muted); margin:10px 0 4px;}
+  #tally b{color:var(--ink);}
+  #subjstats{margin:14px 0 6px; display:grid; gap:10px;}
+  .substat-top{display:flex; justify-content:space-between; align-items:baseline; font-size:.86rem; margin-bottom:4px; gap:10px; flex-wrap:wrap;}
+  .substat-top .nm{font-weight:700;}
+  .substat-top .pc{color:var(--muted); font-size:.8rem;}
+  .pc .w{color:#c23b16; font-weight:700;} .pc .o{color:#9a7000; font-weight:700;} .pc .s{color:#1e7d3c; font-weight:700;}
+  .bar{height:12px; border-radius:6px; overflow:hidden; background:#e7ebf1; display:flex;}
+  .bar i{display:block; height:100%;}
+  .bar .sW{background:#e4572e;} .bar .sO{background:#f4d03f;} .bar .sS{background:#2e9e5b;}
+  .needwork{display:inline-block; background:#fdeae4; color:#c23b16; font-size:.66rem; font-weight:800; padding:1px 7px; border-radius:5px; margin-left:6px; text-transform:uppercase; vertical-align:middle;}
+  .ctrlbtn{font:inherit; font-size:.82rem; font-weight:600; padding:6px 13px; border-radius:8px; border:1px solid var(--line); background:#fff; color:var(--ink); cursor:pointer; margin-right:8px;}
+  .ctrlbtn:hover{background:var(--soft);}
+  .palette{position:absolute; z-index:50; display:none; gap:6px; align-items:center; background:#fff; border:1px solid var(--line); box-shadow:0 8px 28px rgba(20,25,40,.20); border-radius:12px; padding:9px 10px;}
+  .pal-dot{width:26px; height:26px; border-radius:50%; border:2px solid rgba(0,0,0,.12); cursor:pointer; padding:0; transition:transform .08s;}
+  .pal-dot:hover{transform:scale(1.15);}
+  .pal-clear{width:26px; height:26px; border-radius:50%; border:1px solid var(--line); background:#f2f4f8; cursor:pointer; color:var(--muted); font-size:.85rem; line-height:1;}
+
+  @media print{
+    body{background:#fff;} .wrap{max-width:none; padding:0;}
+    section,.day,header.hero,.recipe{break-inside:avoid; box-shadow:none;}
+    header.hero{-webkit-print-color-adjust:exact; print-color-adjust:exact;}
+    .tag,.chip,.day-head,th,.rx,.recipe .letter,.tl,.sw{-webkit-print-color-adjust:exact; print-color-adjust:exact;}
+    .palette,.ctrlbtn{display:none !important;}
+  }
+  @media(max-width:640px){ .grid2,.loop{grid-template-columns:1fr;} header.hero{padding:24px;} }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="hero">
+  <h1>Trial HSC Study Pack</h1>
+  <p>Sydney stay · study run <strong>Mon 13 – Sat 18 July</strong> (Sundays are travel days)</p>
+  <p>Interactive — click any circle to set your colour as you go.</p>
+  <div class="badges">
+    <span class="badge">🎯 Trial prep</span>
+    <span class="badge">🖍️ Click to re-colour</span>
+    <span class="badge">💾 Saves in your browser</span>
+    <span class="badge">🧠 Recall &gt; re-reading</span>
+  </div>
+</header>
+
+<section class="tracker">
+  <h2><span class="num">★</span>Make it yours — track your confidence</h2>
+  <p class="lead">This is your living traffic-light. Every topic below has a <strong>circle</strong> — click it, pick one of your five colours, and it updates. It saves automatically. Re-colour as you go: the whole point is watching reds turn green.</p>
+  <div class="tlkey">
+    <span><span class="sw dg"></span> Dark green — mastered</span>
+    <span><span class="sw lg"></span> Light green — good</span>
+    <span><span class="sw yl"></span> Yellow — OK</span>
+    <span><span class="sw or"></span> Orange — shaky</span>
+    <span><span class="sw rd"></span> Red — weak</span>
+  </div>
+  <div id="subjstats"></div>
+  <p style="font-size:.78rem; color:var(--muted); margin:2px 0 0;">Overall across all four subjects — weak (orange+red) high = study there first.</p>
+  <div id="tally">Loading your progress…</div>
+  <div style="margin-top:8px;">
+    <button class="ctrlbtn" id="printBtn">🖨 Print</button>
+    <button class="ctrlbtn" id="resetBtn">↺ Reset all colours</button>
+  </div>
+  <div class="callout" style="margin-top:14px;"><strong>Two things to know:</strong> the coloured word-chips in the tables (<span class="chip c-red">RED</span> <span class="chip c-amber">AMBER</span> <span class="chip c-green">GREEN</span>) are <em>my</em> suggested priority — they don't change. The circles in the "You" column are <em>yours</em> to set. And to make your colours stick between sessions, <strong>download this file and open it in your browser</strong> (Chrome/Safari) — that's where it remembers everything.</div>
+</section>
+
+<section>
+  <h2><span class="num">§1</span>How to use this pack</h2>
+  <p class="lead">Five parts: where you stand (colour it in), an English self-assessment, a Visual Arts game-plan, the <strong>study recipes</strong> (the how-to), then the week.</p>
+  <ul>
+    <li><strong>Start with §6 (the recipes).</strong> Every block in your week is really one of nine recipes. The day plan gives the topic; the recipe gives the moves.</li>
+    <li><strong>Times are suggestions, not law.</strong> Slot the blocks into whatever your day looks like. Order and balance matter more than the clock.</li>
+    <li><strong>Work in ~1–1.5 hr blocks</strong> with a proper break between (the first one always runs long — that's normal). Reds get your freshest hours.</li>
+    <li><strong>Re-colour as you go.</strong> A topic isn't "done" when you've read it — it's done when you can explain it with the notes closed. Click it up to green when that's true.</li>
+  </ul>
+</section>
+
+<section>
+  <h2><span class="num">§2</span>Health &amp; Movement Science <span class="tag t-hms">HMS</span></h2>
+  <p class="lead">Every syllabus dot point, grouped by module. Set your own circle in the "You" column as things improve.</p>
+  <div class="callout">The exam: one written paper, <strong>100 marks · 3 hours</strong> (+10 min reading), in <strong>three sections</strong> — multiple choice, short answer, and extended response. All questions are compulsory (no choice of essay), with roughly <strong>equal weighting</strong> across the two focus areas: <em>Health in an Australian &amp; global context</em> and <em>Training for improved performance</em>.</div>
+  <table>
+    <thead><tr><th class="youcol">You</th><th class="prio">Priority</th><th>Topic</th><th>What to nail</th></tr></thead>
+    <tbody>
+      <tr class="mod"><td colspan="4">Health in an Australian &amp; global context</td></tr>
+      <tr class="grp"><td colspan="4">How healthy are Australians?</td></tr>
+      <tr><td class="youcol"><button class="tl" data-id="hms-status" data-subj="hms"></button></td><td class="prio"><span class="chip c-amber">AMBER</span></td><td><strong>Health status of Australians</strong></td><td>Current data trends; major causes of illness &amp; death &amp; life expectancy; sociological causes of risky behaviours; where inequities exist.</td></tr>
+      <tr><td class="youcol"><button class="tl" data-id="hms-groups" data-subj="hms"></button></td><td class="prio"><span class="chip c-green">GREEN</span></td><td><strong>Groups experiencing inequities</strong></td><td>Aboriginal &amp; Torres Strait Islander Peoples + one other group; how determinants interact; causes; actions to close the gap.</td></tr>
+      <tr><td class="youcol"><button class="tl" data-id="hms-conditions" data-subj="hms"></button></td><td class="prio"><span class="chip c-green">GREEN</span></td><td><strong>CVD, cancer &amp; one other condition</strong></td><td>Death/illness, prevalence &amp; incidence; risk &amp; protective factors; where &amp; for whom it's changing.</td></tr>
+      <tr><td class="youcol"><button class="tl" data-id="hms-oecd" data-subj="hms"></button></td><td class="prio"><span class="chip c-amber">AMBER</span></td><td><strong>Australia vs other OECD countries</strong></td><td>Where Australia ranks &amp; why; what we can learn from countries that rank higher or lower.</td></tr>
+      <tr><td class="youcol"><button class="tl" data-id="hms-ageing" data-subj="hms"></button></td><td class="prio"><span class="chip c-amber">AMBER</span></td><td><strong>Impact of an ageing population</strong></td><td>What healthy ageing is; opportunities &amp; challenges; current &amp; future strategies; what gov &amp; non-gov must plan for.</td></tr>
+      <tr class="grp"><td colspan="4">How does Australia's healthcare system work towards better health for all?</td></tr>
+      <tr><td class="youcol"><button class="tl" data-id="hms-effect" data-subj="hms"></button></td><td class="prio"><span class="chip c-amber">AMBER</span></td><td><strong>Effectiveness of the healthcare system</strong></td><td>The role of the system; equity of access; future opportunities.</td></tr>
+      <tr><td class="youcol"><button class="tl" data-id="hms-roles" data-subj="hms"></button></td><td class="prio"><span class="chip c-red">RED</span></td><td><strong>Who's responsible — gov &amp; non-gov</strong></td><td>Federal / state / local government; private &amp; not-for-profit sectors; how they share responsibility.</td></tr>
+      <tr><td class="youcol"><button class="tl" data-id="hms-collab" data-subj="hms"></button></td><td class="prio"><span class="chip c-red">RED</span></td><td><strong>Gov &amp; non-gov collaboration</strong></td><td>How the two work together to provide person-centred healthcare.</td></tr>
+      <tr><td class="youcol"><button class="tl" data-id="hms-expenditure" data-subj="hms"></button></td><td class="prio"><span class="chip c-red">RED</span></td><td><strong>Health expenditure</strong></td><td>Healthcare vs prevention; sustainability, access &amp; equity; Medicare, private health insurance &amp; Commonwealth programs.</td></tr>
+      <tr><td class="youcol"><button class="tl" data-id="hms-complementary" data-subj="hms"></button></td><td class="prio"><span class="chip c-amber">AMBER</span></td><td><strong>Complementary healthcare</strong></td><td>Products &amp; services available; as prevention; treating an issue; as a supplement to medical treatment.</td></tr>
+      <tr><td class="youcol"><button class="tl" data-id="hms-consumer" data-subj="hms"></button></td><td class="prio"><span class="chip c-red">RED</span></td><td><strong>Being a critical health consumer</strong></td><td>Whom to believe; what you need to make informed decisions; judging accuracy &amp; credibility of info, products &amp; services.</td></tr>
+      <tr><td class="youcol"><button class="tl" data-id="hms-challenges" data-subj="hms"></button></td><td class="prio"><span class="chip c-red">RED</span></td><td><strong>Emerging challenges to the system</strong></td><td>Current &amp; emerging changes and pressures facing the healthcare system.</td></tr>
+      <tr class="grp"><td colspan="4">How is technology &amp; data impacting the healthcare system?</td></tr>
+      <tr><td class="youcol"><button class="tl" data-id="hms-techrel" data-subj="hms"></button></td><td class="prio"><span class="chip c-amber">AMBER</span></td><td><strong>Technology &amp; health</strong></td><td>The relationship between technology and health.</td></tr>
+      <tr><td class="youcol"><button class="tl" data-id="hms-newtech" data-subj="hms"></button></td><td class="prio"><span class="chip c-amber">AMBER</span></td><td><strong>New technologies &amp; treatments</strong></td><td>Emerging tools &amp; treatments in the healthcare system.</td></tr>
+      <tr><td class="youcol"><button class="tl" data-id="hms-digital" data-subj="hms"></button></td><td class="prio"><span class="chip c-amber">AMBER</span></td><td><strong>Digital health</strong></td><td>What it is; what services exist; how well it connects health info; challenges &amp; opportunities.</td></tr>
+      <tr><td class="youcol"><button class="tl" data-id="hms-bigdata" data-subj="hms"></button></td><td class="prio"><span class="chip c-red">RED</span></td><td><strong>Big data in health</strong></td><td>How it's used; how it reduces spending; curing &amp; managing disease; privacy &amp; confidentiality.</td></tr>
+      <tr class="grp"><td colspan="4">What actions are needed to promote &amp; improve health?</td></tr>
+      <tr><td class="youcol"><button class="tl" data-id="hms-sdgs" data-subj="hms"></button></td><td class="prio"><span class="chip c-red">RED</span></td><td><strong>The SDGs (3, 4, 10, 11)</strong></td><td>The key features of each of the four goals.</td></tr>
+      <tr><td class="youcol"><button class="tl" data-id="hms-sdg-apply" data-subj="hms"></button></td><td class="prio"><span class="chip c-red">RED</span></td><td><strong>Applying SDGs to a community</strong></td><td>How they've worked in other communities; lessons; a community's major issues; strategies; how you'd know they worked.</td></tr>
+      <tr class="mod"><td colspan="4">Training for Improved Performance</td></tr>
+      <tr class="grp"><td colspan="4">Personalising exercise assessment &amp; prescription</td></tr>
+      <tr><td class="youcol"><button class="tl" data-id="hms-prescreen" data-subj="hms"></button></td><td class="prio"><span class="chip c-green">GREEN</span></td><td><strong>Pre-exercise screening</strong></td><td>Why a pre-exercise questionnaire &amp; health screening matter.</td></tr>
+      <tr><td class="youcol"><button class="tl" data-id="hms-testing" data-subj="hms"></button></td><td class="prio"><span class="chip c-green">GREEN</span></td><td><strong>Fitness / performance testing</strong></td><td>Its use for recreational participants &amp; elite athletes.</td></tr>
+      <tr><td class="youcol"><button class="tl" data-id="hms-assess-dev" data-subj="hms"></button></td><td class="prio"><span class="chip c-green">GREEN</span></td><td><strong>Assessment → training programs</strong></td><td>How exercise assessment shapes a training program.</td></tr>
+      <tr class="grp"><td colspan="4">How does training influence movement &amp; performance?</td></tr>
+      <tr><td class="youcol"><button class="tl" data-id="hms-methods" data-subj="hms"></button></td><td class="prio"><span class="chip c-green">GREEN</span></td><td><strong>Training types &amp; methods</strong></td><td>Anaerobic, aerobic, flexibility, strength, and skill &amp; tactical — and which suits which sport.</td></tr>
+      <tr><td class="youcol"><button class="tl" data-id="hms-train-principles" data-subj="hms"></button></td><td class="prio"><span class="chip c-amber">AMBER</span></td><td><strong>Principles of training</strong></td><td>Progressive overload, thresholds, reversibility, specificity, variety, warm-up &amp; cool-down (applied to aerobic &amp; strength).</td></tr>
+      <tr><td class="youcol"><button class="tl" data-id="hms-train-physio" data-subj="hms"></button></td><td class="prio"><span class="chip c-amber">AMBER</span></td><td><strong>Physiological adaptations</strong></td><td>Heart rate; stroke volume &amp; cardiac output; O₂ uptake &amp; lung capacity; haemoglobin; muscle hypertrophy; fast/slow-twitch fibres.</td></tr>
+      <tr class="grp"><td colspan="4">How does training differ for individual &amp; group sports?</td></tr>
+      <tr><td class="youcol"><button class="tl" data-id="hms-train-session" data-subj="hms"></button></td><td class="prio"><span class="chip c-amber">AMBER</span></td><td><strong>Designing a session (individual vs group)</strong></td><td>Safety; aim; warm-up/cool-down; skill instruction; conditioning; strategies &amp; tactics; reflection/evaluation.</td></tr>
+      <tr><td class="youcol"><button class="tl" data-id="hms-yearly" data-subj="hms"></button></td><td class="prio"><span class="chip c-amber">AMBER</span></td><td><strong>Yearly program (individual vs group)</strong></td><td>Phases (pre/in/off-season); sub-phases; peaking &amp; tapering; sport-specific attributes.</td></tr>
+      <tr><td class="youcol"><button class="tl" data-id="hms-psych" data-subj="hms"></button></td><td class="prio"><span class="chip c-green">GREEN</span></td><td><strong>Psychological strategies</strong></td><td>Optimising arousal; managing stress &amp; anxiety in individual &amp; group sports.</td></tr>
+      <tr><td class="youcol"><button class="tl" data-id="hms-tactics" data-subj="hms"></button></td><td class="prio"><span class="chip c-green">GREEN</span></td><td><strong>Applying strategies &amp; tactics</strong></td><td>Factors that influence how they're applied.</td></tr>
+      <tr class="grp"><td colspan="4">Sleep, nutrition &amp; supplementation</td></tr>
+      <tr><td class="youcol"><button class="tl" data-id="hms-diet" data-subj="hms"></button></td><td class="prio"><span class="chip c-amber">AMBER</span></td><td><strong>Dietary &amp; fluid requirements</strong></td><td>What athletes need pre / during / post performance across different sports.</td></tr>
+      <tr><td class="youcol"><button class="tl" data-id="hms-sleep" data-subj="hms"></button></td><td class="prio"><span class="chip c-amber">AMBER</span></td><td><strong>Sleep, nutrition &amp; hydration</strong></td><td>Reducing fatigue &amp; aiding movement/injury prevention; guidelines, planning, routines, monitoring.</td></tr>
+      <tr><td class="youcol"><button class="tl" data-id="hms-supps" data-subj="hms"></button></td><td class="prio"><span class="chip c-green">GREEN</span></td><td><strong>Supplements</strong></td><td>Micronutrients, protein, caffeine &amp; creatine for performance.</td></tr>
+      <tr class="grp"><td colspan="4">How do individuals train for sustained movement &amp; performance?</td></tr>
+      <tr><td class="youcol"><button class="tl" data-id="hms-biomech" data-subj="hms"></button></td><td class="prio"><span class="chip c-green">GREEN</span></td><td><strong>Biomechanics</strong></td><td>Using it to develop efficient movement.</td></tr>
+      <tr><td class="youcol"><button class="tl" data-id="hms-recovery" data-subj="hms"></button></td><td class="prio"><span class="chip c-green">GREEN</span></td><td><strong>Recovery strategies</strong></td><td>Physiological (cool-down, hydrotherapy); psychological (relaxation).</td></tr>
+      <tr><td class="youcol"><button class="tl" data-id="hms-tech-perf" data-subj="hms"></button></td><td class="prio"><span class="chip c-green">GREEN</span></td><td><strong>Technology for performance</strong></td><td>Training innovations; equipment advances; recording &amp; monitoring.</td></tr>
+      <tr><td class="youcol"><button class="tl" data-id="hms-injury" data-subj="hms"></button></td><td class="prio"><span class="chip c-green">GREEN</span></td><td><strong>Injury management &amp; TOTAPS</strong></td><td>Classifying injuries (direct/indirect, soft/hard tissue, overuse); TOTAPS assessment; managing injuries.</td></tr>
+      <tr><td class="youcol"><button class="tl" data-id="hms-rehab" data-subj="hms"></button></td><td class="prio"><span class="chip c-amber">AMBER</span></td><td><strong>Rehab &amp; return-to-play</strong></td><td>Progressive mobilisation, graduated exercise, heat &amp; cold; return-to-play policy &amp; procedures.</td></tr>
+      <tr><td class="youcol"><button class="tl" data-id="hms-drugs" data-subj="hms"></button></td><td class="prio"><span class="chip c-green">GREEN</span></td><td><strong>Drugs in sport</strong></td><td>Impact on injury management &amp; performance; health implications; ethics; drug testing.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section>
+  <h2><span class="num">§3</span>Biology <span class="tag t-bio">Bio</span></h2>
+  <p class="lead">Every syllabus dot point, grouped by module. Set your own circle in the "You" column as things improve.</p>
+  <div class="callout">The exam: one written paper, <strong>100 marks · 3 hours</strong> (+5 min reading). <strong>Section I</strong> = 20 marks of multiple choice; <strong>Section II</strong> = 80 marks of short-answer &amp; extended-response (usually one longer ~7–9 mark response). <strong>Equal weighting</strong> across Modules 5–8 (Heredity, Genetic Change, Infectious Disease, and Non-infectious Disease &amp; Disorders), with Working Scientifically skills throughout.</div>
+  <table>
+    <thead><tr><th class="youcol">You</th><th class="prio">Priority</th><th>Topic</th><th>What to nail</th></tr></thead>
+    <tbody>
+      <tr class="mod"><td colspan="4">Module 5 — Heredity</td></tr>
+      <tr class="grp"><td colspan="4">Reproduction</td></tr>
+      <tr><td class="youcol"><button class="tl" data-id="bio-repro" data-subj="bio"></button></td><td class="prio"><span class="chip c-green">GREEN</span></td><td><strong>Mechanisms of reproduction</strong></td><td>How animals, plants, fungi, bacteria &amp; protists reproduce to ensure continuity.</td></tr>
+      <tr><td class="youcol"><button class="tl" data-id="bio-fert" data-subj="bio"></button></td><td class="prio"><span class="chip c-green">GREEN</span></td><td><strong>Fertilisation &amp; implantation</strong></td><td>Features in mammals.</td></tr>
+      <tr><td class="youcol"><button class="tl" data-id="bio-hormonal" data-subj="bio"></button></td><td class="prio"><span class="chip c-amber">AMBER</span></td><td><strong>Hormonal control of pregnancy &amp; birth</strong></td><td>The hormones controlling pregnancy &amp; birth in mammals.</td></tr>
+      <tr><td class="youcol"><button class="tl" data-id="bio-agri-repro" data-subj="bio"></button></td><td class="prio"><span class="chip c-green">GREEN</span></td><td><strong>Manipulating reproduction in agriculture</strong></td><td>Impact of scientific knowledge on plant &amp; animal reproduction.</td></tr>
+      <tr class="grp"><td colspan="4">Cell Replication</td></tr>
+      <tr><td class="youcol"><button class="tl" data-id="bio-cellrep" data-subj="bio"></button></td><td class="prio"><span class="chip c-green">GREEN</span></td><td><strong>Cell replication</strong></td><td>Mitosis &amp; meiosis; DNA replication using the Watson–Crick model.</td></tr>
+      <tr><td class="youcol"><button class="tl" data-id="bio-cellrep-effect" data-subj="bio"></button></td><td class="prio"><span class="chip c-green">GREEN</span></td><td><strong>Replication &amp; continuity</strong></td><td>Effect of the replication processes on continuity of species.</td></tr>
+      <tr class="grp"><td colspan="4">DNA &amp; Polypeptide Synthesis</td></tr>
+      <tr><td class="youcol"><button class="tl" data-id="bio-dna-forms" data-subj="bio"></button></td><td class="prio"><span class="chip c-green">GREEN</span></td><td><strong>Forms of DNA</strong></td><td>How DNA exists in eukaryotes vs prokaryotes.</td></tr>
+      <tr><td class="youcol"><button class="tl" data-id="bio-polypep" data-subj="bio"></button></td><td class="prio"><span class="chip c-green">GREEN</span></td><td><strong>Polypeptide synthesis</strong></td><td>Transcription &amp; translation; the role of mRNA &amp; tRNA; why it matters.</td></tr>
+      <tr><td class="youcol"><button class="tl" data-id="bio-pheno" data-subj="bio"></button></td><td class="prio"><span class="chip c-amber">AMBER</span></td><td><strong>Phenotypic expression</strong></td><td>How genes &amp; the environment shape phenotype.</td></tr>
+      <tr><td class="youcol"><button class="tl" data-id="bio-proteins" data-subj="bio"></button></td><td class="prio"><span class="chip c-green">GREEN</span></td><td><strong>Proteins</strong></td><td>Their structure &amp; function in living things.</td></tr>
+      <tr class="grp"><td colspan="4">Genetic Variation</td></tr>
+      <tr><td class="youcol"><button class="tl" data-id="bio-meiosis-var" data-subj="bio"></button></td><td class="prio"><span class="chip c-amber">AMBER</span></td><td><strong>Variation from meiosis</strong></td><td>Predicting genotypes via crossing over, fertilisation &amp; mutation.</td></tr>
+      <tr><td class="youcol"><button class="tl" data-id="bio-modes" data-subj="bio"></button></td><td class="prio"><span class="chip c-amber">AMBER</span></td><td><strong>Inheritance patterns</strong></td><td>Autosomal, sex-linkage, co-dominance, incomplete dominance &amp; multiple alleles.</td></tr>
+      <tr><td class="youcol"><button class="tl" data-id="bio-pedigrees" data-subj="bio"></button></td><td class="prio"><span class="chip c-amber">AMBER</span></td><td><strong>Pedigrees &amp; Punnett squares</strong></td><td>Constructing &amp; interpreting them — learned by doing problems.</td></tr>
+      <tr><td class="youcol"><button class="tl" data-id="bio-freq" data-subj="bio"></button></td><td class="prio"><span class="chip c-red">RED</span></td><td><strong>Frequencies in a population</strong></td><td>Recording &amp; presenting frequency data over generations; SNP analysis.</td></tr>
+      <tr class="grp"><td colspan="4">Inheritance Patterns in a Population</td></tr>
+      <tr><td class="youcol"><button class="tl" data-id="bio-tech-inherit" data-subj="bio"></button></td><td class="prio"><span class="chip c-red">RED</span></td><td><strong>Technologies for inheritance patterns</strong></td><td>DNA sequencing &amp; profiling.</td></tr>
+      <tr><td class="youcol"><button class="tl" data-id="bio-data-projects" data-subj="bio"></button></td><td class="prio"><span class="chip c-red">RED</span></td><td><strong>Large-scale genetics data</strong></td><td>Conservation management; inheritance of a disease/disorder; human evolution.</td></tr>
+      <tr class="mod"><td colspan="4">Module 6 — Genetic Change</td></tr>
+      <tr class="grp"><td colspan="4">Mutation</td></tr>
+      <tr><td class="youcol"><button class="tl" data-id="bio-mutagens" data-subj="bio"></button></td><td class="prio"><span class="chip c-green">GREEN</span></td><td><strong>Mutagens</strong></td><td>How electromagnetic radiation, chemicals &amp; naturally occurring mutagens work.</td></tr>
+      <tr><td class="youcol"><button class="tl" data-id="bio-mut-types" data-subj="bio"></button></td><td class="prio"><span class="chip c-green">GREEN</span></td><td><strong>Types of mutation</strong></td><td>Point vs chromosomal — causes, processes &amp; effects.</td></tr>
+      <tr><td class="youcol"><button class="tl" data-id="bio-somatic-germ" data-subj="bio"></button></td><td class="prio"><span class="chip c-green">GREEN</span></td><td><strong>Somatic vs germ-line mutations</strong></td><td>Their different effects on an organism.</td></tr>
+      <tr><td class="youcol"><button class="tl" data-id="bio-coding" data-subj="bio"></button></td><td class="prio"><span class="chip c-green">GREEN</span></td><td><strong>Coding vs non-coding DNA</strong></td><td>Their significance in the process of mutation.</td></tr>
+      <tr><td class="youcol"><button class="tl" data-id="bio-var-causes" data-subj="bio"></button></td><td class="prio"><span class="chip c-green">GREEN</span></td><td><strong>Causes of genetic variation</strong></td><td>Fertilisation, meiosis &amp; mutation.</td></tr>
+      <tr><td class="youcol"><button class="tl" data-id="bio-genepool" data-subj="bio"></button></td><td class="prio"><span class="chip c-green">GREEN</span></td><td><strong>Mutation, gene flow &amp; drift</strong></td><td>Their effect on the gene pool of populations.</td></tr>
+      <tr class="grp"><td colspan="4">Biotechnology</td></tr>
+      <tr><td class="youcol"><button class="tl" data-id="bio-biotech" data-subj="bio"></button></td><td class="prio"><span class="chip c-green">GREEN</span></td><td><strong>Biotechnology uses</strong></td><td>Past/present/future applications; social &amp; ethical issues; effect on biodiversity.</td></tr>
+      <tr class="grp"><td colspan="4">Genetic Technologies</td></tr>
+      <tr><td class="youcol"><button class="tl" data-id="bio-gentech" data-subj="bio"></button></td><td class="prio"><span class="chip c-green">GREEN</span></td><td><strong>Current genetic technologies</strong></td><td>Uses &amp; advantages of technologies that induce genetic change.</td></tr>
+      <tr><td class="youcol"><button class="tl" data-id="bio-reprotech" data-subj="bio"></button></td><td class="prio"><span class="chip c-green">GREEN</span></td><td><strong>Reproductive technologies</strong></td><td>Artificial insemination vs artificial pollination.</td></tr>
+      <tr><td class="youcol"><button class="tl" data-id="bio-cloning" data-subj="bio"></button></td><td class="prio"><span class="chip c-green">GREEN</span></td><td><strong>Cloning</strong></td><td>Whole-organism vs gene cloning; how effective each is.</td></tr>
+      <tr><td class="youcol"><button class="tl" data-id="bio-recombinant" data-subj="bio"></button></td><td class="prio"><span class="chip c-green">GREEN</span></td><td><strong>Recombinant DNA</strong></td><td>Techniques &amp; applications; developing transgenic organisms.</td></tr>
+      <tr><td class="youcol"><button class="tl" data-id="bio-gentech-benefits" data-subj="bio"></button></td><td class="prio"><span class="chip c-green">GREEN</span></td><td><strong>Benefits of genetic technologies</strong></td><td>In agricultural, medical &amp; industrial applications.</td></tr>
+      <tr><td class="youcol"><button class="tl" data-id="bio-biodiversity" data-subj="bio"></button></td><td class="prio"><span class="chip c-green">GREEN</span></td><td><strong>Biotech &amp; biodiversity</strong></td><td>Effect of using biotechnology in agriculture on biodiversity.</td></tr>
+      <tr><td class="youcol"><button class="tl" data-id="bio-secondary" data-subj="bio"></button></td><td class="prio"><span class="chip c-green">GREEN</span></td><td><strong>Social / economic / cultural contexts</strong></td><td>Interpreting secondary sources on a range of biotechnologies.</td></tr>
+      <tr class="mod"><td colspan="4">Module 7 — Infectious Disease</td></tr>
+      <tr class="grp"><td colspan="4">Causes</td></tr>
+      <tr><td class="youcol"><button class="tl" data-id="bio-pathogens" data-subj="bio"></button></td><td class="prio"><span class="chip c-amber">AMBER</span></td><td><strong>Infectious diseases &amp; transmission</strong></td><td>Classifying pathogens; epidemics; microbial testing; modes of transmission (direct, indirect, vector).</td></tr>
+      <tr><td class="youcol"><button class="tl" data-id="bio-koch-pasteur" data-subj="bio"></button></td><td class="prio"><span class="chip c-green">GREEN</span></td><td><strong>Koch &amp; Pasteur</strong></td><td>Koch's postulates; Pasteur's experiments on microbial contamination.</td></tr>
+      <tr><td class="youcol"><button class="tl" data-id="bio-agri-disease" data-subj="bio"></button></td><td class="prio"><span class="chip c-amber">AMBER</span></td><td><strong>Disease in agriculture</strong></td><td>Effects of plant &amp; animal diseases on agricultural production.</td></tr>
+      <tr><td class="youcol"><button class="tl" data-id="bio-adaptations" data-subj="bio"></button></td><td class="prio"><span class="chip c-green">GREEN</span></td><td><strong>Pathogen adaptations</strong></td><td>How they enter &amp; spread between hosts.</td></tr>
+      <tr class="grp"><td colspan="4">Responses to Pathogens &amp; Immunity</td></tr>
+      <tr><td class="youcol"><button class="tl" data-id="bio-plant-response" data-subj="bio"></button></td><td class="prio"><span class="chip c-amber">AMBER</span></td><td><strong>Plant response to a pathogen</strong> <span class="det">(untested)</span></td><td>A named Australian plant's response to a named pathogen.</td></tr>
+      <tr><td class="youcol"><button class="tl" data-id="bio-host-response" data-subj="bio"></button></td><td class="prio"><span class="chip c-amber">AMBER</span></td><td><strong>Host responses</strong> <span class="det">(untested)</span></td><td>Physical &amp; chemical changes in host cells &amp; tissues.</td></tr>
+      <tr><td class="youcol"><button class="tl" data-id="bio-immune-model" data-subj="bio"></button></td><td class="prio"><span class="chip c-amber">AMBER</span></td><td><strong>Innate &amp; adaptive immunity</strong> <span class="det">(untested)</span></td><td>Model the innate &amp; adaptive immune systems.</td></tr>
+      <tr><td class="youcol"><button class="tl" data-id="bio-immune-response" data-subj="bio"></button></td><td class="prio"><span class="chip c-amber">AMBER</span></td><td><strong>Immune response to exposure</strong> <span class="det">(untested)</span></td><td>What happens after primary exposure; innate &amp; acquired immunity.</td></tr>
+    </tbody>
+  </table>
+  <div class="callout warn"><strong>Flag:</strong> Module 7 immunity had no traffic lights on your scans. If your trial covers it, don't let it be a blind spot — it's booked for Thursday.</div>
+</section>
+
+<section>
+  <h2><span class="num">§4</span>English Advanced — self-assessment you <em>can</em> traffic-light</h2>
+  <p class="lead">A whole module is too big to colour in one go, so it's broken into skills. Click the circle on each row to rate yourself. Any orange/red is a target this week.</p>
+
+  <div class="callout">The exam: <strong>Paper 1</strong> = Common Module (Texts &amp; Human Experiences) — unseen short-answers + an essay (50 marks, 1.5 hrs). <strong>Paper 2</strong> = Module A + B + C, one response each (25 marks each, 2 hrs).</div>
+
+  <h3>Common Module — Texts &amp; Human Experiences <span class="tag t-eng">Paper 1</span></h3>
+  <div class="mini">
+    <div class="checkrow"><button class="tl" data-id="eng-cm-1" data-subj="eng"></button><div>I can name my text's form, composer &amp; the human experiences / emotions it explores</div></div>
+    <div class="checkrow"><button class="tl" data-id="eng-cm-2" data-subj="eng"></button><div>I have 6–8 quotes with techniques, and know what each reveals about <em>human experience</em></div></div>
+    <div class="checkrow"><button class="tl" data-id="eng-cm-3" data-subj="eng"></button><div>I can discuss the "anomalies, paradoxes &amp; inconsistencies" in human behaviour the text shows</div></div>
+    <div class="checkrow"><button class="tl" data-id="eng-cm-4" data-subj="eng"></button><div>I can write a thesis that <em>answers an unseen question</em>, not retells the text</div></div>
+    <div class="checkrow"><button class="tl" data-id="eng-cm-5" data-subj="eng"></button><div>I can analyse an <strong>unseen text</strong> fast (Section I): technique → human experience</div></div>
+    <div class="checkrow"><button class="tl" data-id="eng-cm-6" data-subj="eng"></button><div>I can plan &amp; write a full essay in ~40 min</div></div>
+  </div>
+
+  <div class="grid2" style="margin-top:14px;">
+    <div>
+      <h3>Module A — Textual Conversations <span class="tag t-eng">Paper 2</span></h3>
+      <div class="mini">
+        <div class="checkrow"><button class="tl" data-id="eng-a-1" data-subj="eng"></button><div>I know <strong>both</strong> texts, their forms &amp; contexts</div></div>
+        <div class="checkrow"><button class="tl" data-id="eng-a-2" data-subj="eng"></button><div>I can explain how the later text reimagines / resonates with the earlier</div></div>
+        <div class="checkrow"><button class="tl" data-id="eng-a-3" data-subj="eng"></button><div>I have 3–4 comparison points with <em>paired</em> evidence</div></div>
+        <div class="checkrow"><button class="tl" data-id="eng-a-4" data-subj="eng"></button><div>I write <em>integrated</em> comparison, not text-by-text</div></div>
+      </div>
+    </div>
+    <div>
+      <h3>Module B — Critical Study <span class="tag t-eng">Paper 2</span></h3>
+      <div class="mini">
+        <div class="checkrow"><button class="tl" data-id="eng-b-1" data-subj="eng"></button><div>I know the text as a <strong>whole</strong>, not just fragments</div></div>
+        <div class="checkrow"><button class="tl" data-id="eng-b-2" data-subj="eng"></button><div>I can argue its textual integrity / why it's valued</div></div>
+        <div class="checkrow"><button class="tl" data-id="eng-b-3" data-subj="eng"></button><div>I understand different critical readings of it</div></div>
+        <div class="checkrow"><button class="tl" data-id="eng-b-4" data-subj="eng"></button><div>I have my own <em>informed</em> judgement I can defend</div></div>
+      </div>
+    </div>
+  </div>
+
+  <h3>Module C — The Craft of Writing <span class="tag t-eng">Paper 2</span></h3>
+  <div class="mini">
+    <div class="checkrow"><button class="tl" data-id="eng-c-1" data-subj="eng"></button><div>I have 2–3 polished pieces (imaginative / discursive / persuasive) I can adapt</div></div>
+    <div class="checkrow"><button class="tl" data-id="eng-c-2" data-subj="eng"></button><div>I've studied my mentor texts' stylistic features &amp; can borrow them</div></div>
+    <div class="checkrow"><button class="tl" data-id="eng-c-3" data-subj="eng"></button><div>I can write to an <strong>unseen stimulus</strong> under time</div></div>
+    <div class="checkrow"><button class="tl" data-id="eng-c-4" data-subj="eng"></button><div>I can write a reflection statement justifying my craft choices</div></div>
+  </div>
+
+  <div class="callout"><strong>Do this first (Monday, after pilates):</strong> spend 30–45 min colouring every row. Any orange/red becomes a target this week.</div>
+</section>
+
+<section>
+  <h2><span class="num">§5</span>Visual Arts — what the HSC actually asks</h2>
+  <p class="lead">VA isn't content you memorise — it's a way of <em>thinking &amp; writing</em> about art. Rate your confidence on each core skill.</p>
+  <table>
+    <thead><tr><th>Component</th><th>Weight</th><th>What it is</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Body of Work</strong></td><td>50%</td><td>Your major artwork, submitted later. Keep it moving during trials — lock the <em>concept</em> now.</td></tr>
+      <tr><td><strong>Written exam</strong></td><td>50%</td><td>What your trial tests. <strong>Section I</strong> (25): short answers on unseen plates. <strong>Section II</strong> (25): one essay.</td></tr>
+    </tbody>
+  </table>
+  <p>Every written question makes you use three toolkits. Colour how confident you are with each:</p>
+  <div class="mini">
+    <div class="checkrow"><button class="tl" data-id="va-subjective" data-subj="va"></button><div><strong>Subjective frame</strong> — personal / emotional readings</div></div>
+    <div class="checkrow"><button class="tl" data-id="va-cultural" data-subj="va"></button><div><strong>Cultural frame</strong> — society, politics, identity</div></div>
+    <div class="checkrow"><button class="tl" data-id="va-structural" data-subj="va"></button><div><strong>Structural frame</strong> — signs, symbols, composition, how it's made</div></div>
+    <div class="checkrow"><button class="tl" data-id="va-postmodern" data-subj="va"></button><div><strong>Postmodern frame</strong> — appropriation, irony, questioning conventions</div></div>
+    <div class="checkrow"><button class="tl" data-id="va-conceptual" data-subj="va"></button><div><strong>Conceptual Framework</strong> — Artist ↔ Artwork ↔ World ↔ Audience</div></div>
+    <div class="checkrow"><button class="tl" data-id="va-cases" data-subj="va"></button><div><strong>5+ case studies</strong> I can write about from two frames each</div></div>
+    <div class="checkrow"><button class="tl" data-id="va-s1" data-subj="va"></button><div><strong>Section I</strong> — fast short answers on unseen plates</div></div>
+    <div class="checkrow"><button class="tl" data-id="va-s2" data-subj="va"></button><div><strong>Section II</strong> — a timed essay using my case studies</div></div>
+  </div>
+  <div class="callout"><strong>Fastest win:</strong> if you can confidently apply all four frames to two artworks, you've covered most of what Section I &amp; II reward. Start there.</div>
+</section>
+
+<section>
+  <h2><span class="num">§6</span>Study recipes — <em>how</em> to actually get it in your brain</h2>
+  <p class="lead">You don't need more hours — you need the right moves. The golden rule: <strong>you don't learn by reading, you learn by retrieving.</strong> Forcing information <em>out</em> of your memory is what makes it stick. Every block in your week is one of the recipes below.</p>
+
+  <h3>The Study Loop — for any content topic</h3>
+  <div class="loop">
+    <div class="step"><b>1 · Learn</b><span>Open notes to the exact syllabus dot point. Read once to <em>understand</em>. ~10 min.</span></div>
+    <div class="step"><b>2 · Condense</b><span>Close the book. Rebuild it in your own words — mind map, flowchart, or "explain to a 12-year-old". ~10 min.</span></div>
+    <div class="step"><b>3 · Test</b><span>Everything closed, answer a question on it from memory. ~10 min.</span></div>
+    <div class="step"><b>4 · Fix</b><span>Check against notes in another colour. Gaps become tomorrow's flashcards. ~5 min.</span></div>
+  </div>
+
+  <h3>The nine recipes (your week points to these by letter)</h3>
+
+  <div class="recipe"><h4><span class="letter">A</span>Learn a content topic — HMS &amp; Bio reds, Module 7</h4>
+    <ol>
+      <li>Run the Study Loop on the exact syllabus dot point.</li>
+      <li>For HMS "explain / discuss / assess" points, finish with <strong>3–4 exam-ready dot points + one real example</strong>.</li>
+      <li>Say it out loud once with everything closed. If you can teach it, you know it.</li>
+    </ol>
+  </div>
+  <div class="recipe"><h4><span class="letter">B</span>Master a problem type — pedigrees, Punnett, allele frequencies</h4>
+    <ol>
+      <li>Copy out one worked example step by step.</li>
+      <li>Cover it and redo the same one from scratch.</li>
+      <li>Do 5–8 fresh questions.</li>
+      <li>Re-do only the ones you got wrong until automatic.</li>
+    </ol>
+  </div>
+  <div class="recipe"><h4><span class="letter">C</span>Prep an English module essay</h4>
+    <ol>
+      <li>3 past questions; underline the key word ("to what extent", "how").</li>
+      <li>Write a <strong>thesis</strong> answering one in a single sentence.</li>
+      <li>List 3 techniques + quotes that prove it.</li>
+      <li>Write <strong>one body paragraph</strong>: point → quote → analysis → link to question.</li>
+    </ol>
+  </div>
+  <div class="recipe"><h4><span class="letter">D</span>Timed exam practice</h4>
+    <ol>
+      <li>Timer on. Essay = <strong>5 min plan · 35 min write</strong>.</li>
+      <li><strong>10 min self-mark</strong> against the criteria: answered the question? used the concept? analysed technique? sustained argument?</li>
+      <li>Write your <strong>one biggest fix</strong> at the top. That's the point.</li>
+    </ol>
+  </div>
+  <div class="recipe"><h4><span class="letter">E</span>Craft of Writing (Module C)</h4>
+    <ol>
+      <li>Take one device from a mentor text.</li>
+      <li>Write a short piece to a past stimulus using it deliberately.</li>
+      <li>Add a 3–4 sentence reflection. Keep 2–3 flexible pieces for exam day.</li>
+    </ol>
+  </div>
+  <div class="recipe"><h4><span class="letter">F</span>Build a Visual Arts case study</h4>
+    <ol>
+      <li>One page per artist: artwork · materials · intention · world/context · audience · best 2 frames.</li>
+      <li>Cover it and say the profile from memory.</li>
+      <li>Aim for 5+ artists, each usable from two frames.</li>
+    </ol>
+  </div>
+  <div class="recipe"><h4><span class="letter">G</span>Visual Arts Section I</h4>
+    <ol>
+      <li>Look at the plate 30 sec — subject, materials, composition.</li>
+      <li>Read the question <strong>+ its mark value</strong> (3-marker ≠ 6-marker).</li>
+      <li>Answer using frame/framework language, referencing what you can see. 3–4 per sitting.</li>
+    </ol>
+  </div>
+  <div class="recipe"><h4><span class="letter">H</span>Visual Arts Section II</h4>
+    <ol>
+      <li>Deconstruct the question — which agency or frame is it about?</li>
+      <li>Pick 2 case studies that fit.</li>
+      <li>Plan 3 paragraphs (point + case-study evidence), then write it timed.</li>
+    </ol>
+  </div>
+  <div class="recipe"><h4><span class="letter">I</span>Active recall &amp; flashcards</h4>
+    <ol>
+      <li>Make question → answer cards for facts you keep blanking on.</li>
+      <li>Test, shuffle, re-test the ones you miss.</li>
+      <li>10–15 min, high yield. Great for tired evenings or travel.</li>
+    </ol>
+  </div>
+</section>
+
+<section>
+  <h2><span class="num">§7</span>Your week — Sydney, 12–19 July</h2>
+  <p class="lead">Each block gives the topic <em>and</em> the moves (with its recipe letter). Follow the numbered steps. Shuffle block times to fit each day; keep the mix.</p>
+
+  <div class="callout"><strong>How this fits your week:</strong> <strong>Sun 12</strong> &amp; <strong>Sun 19</strong> are driving days — no study. <strong>Mon</strong> has early 7am pilates and is otherwise a full study day. <strong>Wed</strong> is the light one: 10am ATAR Notes lecture in the city (that lecture <em>is</em> your study) + a possible drone shoot — so just one easy evening block if home. Tue / Thu / Fri / Sat are full days.</div>
+
+  <div class="legend" style="margin-bottom:6px;">
+    <span><span class="tag t-hms">HMS</span></span>
+    <span><span class="tag t-bio">Biology</span></span>
+    <span><span class="tag t-eng">English</span></span>
+    <span><span class="tag t-va">Visual Arts</span></span>
+    <span><span class="tag t-mix">Mixed / exam</span></span>
+    <span><span class="tag t-move">Move</span></span>
+    <span><span class="tag t-rest">Rest</span></span>
+    <span><span class="rx">Rec ·</span> = recipe in §6</span>
+  </div>
+
+  <div class="day off">
+    <div class="day-head"><span>Sunday 12</span><span class="hrs">Travel down · no study</span></div>
+    <table><tbody>
+      <tr><td class="time">—</td><td class="subj"><span class="tag t-rest">Travel</span></td><td>Drive to Sydney, settle in. Evening: a relaxed skim of §5 is plenty — no pressure.</td></tr>
+    </tbody></table>
+  </div>
+
+  <div class="day">
+    <div class="day-head"><span>Monday 13</span><span class="hrs">≈ 5 hrs · pilates + afternoon English</span></div>
+    <table><tbody>
+      <tr class="tguide"><td colspan="3">⏱ 7:00 pilates ✓ · 9:00 Block 1 · 10:30 Block 2 · 11:45 lunch · 12:30 Block 3 · ~3:00 walk at Bicentennial Park · ~4:00 English (essay planning) · ~6:30 dinner &nbsp;— each block ~1.5 hrs, times flexible</td></tr>
+      <tr><td class="time">7:00</td><td class="subj"><span class="tag t-move">Move</span></td><td>Pilates, then breakfast + cook.</td></tr>
+      <tr><td class="time">Block 1<span class="clock">9:00</span></td><td class="subj"><span class="tag t-hms">HMS</span> <span class="chip c-red">RED</span></td><td><strong>Health-in-Australia logistics — your weakest patch.</strong> <span class="rx">Rec A + I</span> The boring funding/responsibility stuff, so do it first while you're fresh &amp; treat it as memorisation, not deep understanding.
+        <ol class="steps">
+          <li>Make a one-page <strong>"who does what" map</strong>: federal / state / local govt + private &amp; NFP; Medicare vs private health insurance; who funds what.</li>
+          <li>Turn it into flashcards &amp; test yourself with the notes closed.</li>
+          <li>Test: "Explain how gov &amp; non-gov share responsibility" in 4 dot points + a real Medicare example. Get it to a reliable yellow/green, then move on — you don't have to love it.</li>
+        </ol></td></tr>
+      <tr><td class="time">Block 2<span class="clock">10:30</span></td><td class="subj"><span class="tag t-bio">Biology</span> <span class="chip c-red">RED</span></td><td><strong>Population genetics + data analysis.</strong> <span class="rx">Rec A + B</span>
+        <ol class="steps">
+          <li>Notes on allele/genotype frequencies (Genetic Variation); condense how frequencies shift over generations + what a SNP is.</li>
+          <li><strong>Data-analysis drill:</strong> pull the graph/table questions out of a past paper &amp; practise the moves — read the trend → explain it → calculate a change. This is your weak skill, so drill it, don't read it.</li>
+          <li>Test: "how do you represent frequency data over generations?"</li>
+        </ol></td></tr>
+      <tr><td class="time"><span class="clock">11:45</span></td><td class="subj"><span class="tag t-rest">Lunch</span></td><td>Cook + break.</td></tr>
+      <tr><td class="time">Block 3<span class="clock">12:30</span></td><td class="subj"><span class="tag t-bio">Biology</span> <span class="chip c-red">RED</span></td><td><strong>Inheritance Patterns in a Population.</strong> <span class="rx">Rec A</span>
+        <ol class="steps">
+          <li>Read how DNA sequencing &amp; profiling reveal patterns.</li>
+          <li>One example each: conservation · a disease/disorder · human evolution.</li>
+          <li>Test: explain each out loud with notes closed.</li>
+        </ol></td></tr>
+      <tr><td class="time">PM<span class="clock">4:00</span></td><td class="subj"><span class="tag t-eng">English</span></td><td><strong>Common Module — essay planning.</strong> <span class="rx">Rec C</span> Real English now your TEAs are done — the skill to drill is adapting them to the question.
+        <ol class="steps">
+          <li>Grab <strong>3 past Common Module questions</strong>; underline the key word in each ("to what extent", "how", "explore").</li>
+          <li>For each, do a <strong>5-min plan</strong>: a one-sentence thesis that answers it + 3 topic sentences + which quotes slot in. Plans, not full essays — you'll cover 3 questions in the time of one essay.</li>
+          <li>Finish by <strong>testing recall</strong>: cover your notes and see if your key quotes come out from memory (it's a closed-book exam).</li>
+        </ol></td></tr>
+    </tbody></table>
+  </div>
+
+  <div class="day">
+    <div class="day-head"><span>Tuesday 14</span><span class="hrs">≈ 4–5 hrs · HMS + Common Mod, then shoot 2:30</span></div>
+    <table><tbody>
+      <tr class="tguide"><td colspan="3">⏱ 8:00 run · 9:00 Block 1 · 10:30 Block 2 · 12:00 Block 3 · ~1:00 lunch + travel into the city · <strong>2:30 drone shoot with Dad</strong> · evening off — you've earned it</td></tr>
+      <tr><td class="time">AM<span class="clock">8:00</span></td><td class="subj"><span class="tag t-move">Move</span></td><td>Morning run — done. ✅</td></tr>
+      <tr><td class="time">Block 1<span class="clock">9:00</span></td><td class="subj"><span class="tag t-hms">HMS</span> <span class="chip c-red">RED</span></td><td><strong>SDGs + applying them.</strong> <span class="rx">Rec A</span> Done this morning. ✅</td></tr>
+      <tr><td class="time">Block 2<span class="clock">10:30</span></td><td class="subj"><span class="tag t-hms">HMS</span> <span class="chip c-amber">AMBER</span></td><td><strong>Training: link the 6 principles → adaptations.</strong> <span class="rx">Rec I</span> Finish this with the flashcards.
+        <ol class="steps">
+          <li>Progressive overload / threshold → the physiological adaptation it drives (stroke volume, capillarisation, etc.).</li>
+          <li>Test yourself both ways: principle → adaptation, and adaptation → which principle.</li>
+          <li>One sentence each on how it improves performance.</li>
+        </ol></td></tr>
+      <tr><td class="time">Block 3<span class="clock">12:00</span></td><td class="subj"><span class="tag t-eng">English</span> <span class="chip c-red">Missed Mon</span></td><td><strong>Common Module — the block you missed yesterday.</strong> <span class="rx">Rec C</span> Get this in before you head out.
+        <ol class="steps">
+          <li>Pick one past Common Module question; write a sharp thesis about human experiences.</li>
+          <li>3 points, each with a quote + technique + effect (your TEAs).</li>
+          <li>Write one full body paragraph — timed if you can.</li>
+        </ol></td></tr>
+      <tr><td class="time"><span class="clock">~1:00</span></td><td class="subj"><span class="tag t-rest">Lunch + travel</span></td><td>Eat, then head into the city for the shoot.</td></tr>
+      <tr><td class="time">Afternoon<span class="clock">2:30</span></td><td class="subj"><span class="tag t-mix">Shoot</span></td><td><strong>Drone shoot with Dad in the city.</strong> That's the rest of the day — no guilt. Reds + Common Mod are done.</td></tr>
+      <tr><td class="time">Eve</td><td class="subj"><span class="tag t-rest">Rest</span></td><td>Evening off.</td></tr>
+    </tbody></table>
+  </div>
+
+  <div class="day">
+    <div class="day-head"><span>Wednesday 15</span><span class="hrs">≈ 5 hrs · Bio lecture + Module A + Visual Arts</span></div>
+    <table><tbody>
+      <tr class="tguide"><td colspan="3">⏱ ~9:00 train into the city · 10:00 ATAR Notes Bio lecture · ~12:30 lunch (city) · ~1:30 Block A (English Module A) · ~3:30 Block B (Visual Arts) · ~5:30 train back to Olympic Park · ~6:30 dinner + optional walk</td></tr>
+      <tr><td class="time">10:00</td><td class="subj"><span class="tag t-bio">Bio lecture</span></td><td><strong>ATAR Notes <em>Biology</em> lecture (UTS, city).</strong> This <em>is</em> study — note their worked examples + how they explain the tricky bits (genetics, data analysis); star anything you didn't know so it feeds Thursday's Bio block.</td></tr>
+      <tr><td class="time">Block A<span class="clock">~1:30</span></td><td class="subj"><span class="tag t-eng">English</span></td><td><strong>Module A.</strong> <span class="rx">Rec C</span> Grab a spot at the city library after the lecture.
+        <ol class="steps">
+          <li>3 past questions; one comparative thesis.</li>
+          <li>3 points with paired evidence (a quote from each text).</li>
+          <li>Write one integrated paragraph.</li>
+        </ol></td></tr>
+      <tr><td class="time">Block B<span class="clock">~3:30</span></td><td class="subj"><span class="tag t-va">Visual Arts</span></td><td><strong>Metalanguage + start your 2 case studies.</strong> <span class="rx">Rec F</span> (Moved from Tuesday.)
+        <ol class="steps">
+          <li>One-page sheet: 4 Frames + Artist–Artwork–World–Audience.</li>
+          <li>Build 2 case-study profiles (artwork · materials · intention · world · audience · best 2 frames).</li>
+          <li>Cover each &amp; say it back. That's 2 down — Thu/Fri finish to 5+.</li>
+        </ol></td></tr>
+      <tr><td class="time">Travel<span class="clock">~5:30</span></td><td class="subj"><span class="tag t-move">Trip back</span></td><td><strong>Train back to Olympic Park.</strong> Wind-down time — flick through your VA case-study notes on the ride, then dinner + an optional Bicentennial Park walk when you're home.</td></tr>
+    </tbody></table>
+  </div>
+
+  <div class="day">
+    <div class="day-head"><span>Thursday 16</span><span class="hrs">≈ 6 hrs · Bio blind spot + healthcare</span></div>
+    <table><tbody>
+      <tr class="tguide"><td colspan="3">⏱ 8:00 gym · 9:00 Block 1 · 10:30 Block 2 · 11:45 lunch · 12:30 Block 3 · 2:00 Block 4 · ~4:00 walk at Bicentennial Park · ~6:00 dinner · ~7:30 evening Bio review</td></tr>
+      <tr><td class="time">AM<span class="clock">8:00</span></td><td class="subj"><span class="tag t-move">Move</span></td><td>Gym — 40–45 min.</td></tr>
+      <tr><td class="time">Block 1<span class="clock">9:00</span></td><td class="subj"><span class="tag t-bio">Biology</span> <span class="chip c-amber">AMBER</span></td><td><strong>Pedigrees &amp; Punnett.</strong> <span class="rx">Rec B</span> (Moved from Tuesday.)
+        <ol class="steps">
+          <li>Copy one worked pedigree + one Punnett (co-dominance &amp; sex-linkage).</li>
+          <li>Cover &amp; redo from scratch.</li>
+          <li>8 fresh questions; re-do the misses.</li>
+        </ol></td></tr>
+      <tr><td class="time">Block 2<span class="clock">10:30</span></td><td class="subj"><span class="tag t-hms">HMS</span> <span class="chip c-red">RED</span></td><td><strong>Critical consumer + big data.</strong> <span class="rx">Rec A</span>
+        <ol class="steps">
+          <li>Build a "how to judge a health source" checklist.</li>
+          <li>Note how big data is used + privacy safeguards.</li>
+          <li>Test: "how do you assess credibility of health info?" in dot points.</li>
+        </ol></td></tr>
+      <tr><td class="time"><span class="clock">11:45</span></td><td class="subj"><span class="tag t-rest">Lunch</span></td><td>Cook + break.</td></tr>
+      <tr><td class="time">Block 3<span class="clock">12:30</span></td><td class="subj"><span class="tag t-hms">HMS</span> <span class="chip c-amber">AMBER</span></td><td><strong>Training: session design + nutrition.</strong> <span class="rx">Rec A</span>
+        <ol class="steps">
+          <li>Table comparing an individual vs group session.</li>
+          <li>Dietary + fluid needs pre / during / post.</li>
+          <li>Test: sketch a quick session outline.</li>
+        </ol></td></tr>
+      <tr><td class="time">Block 4<span class="clock">2:00</span></td><td class="subj"><span class="tag t-eng">English</span></td><td><strong>Module B.</strong> <span class="rx">Rec C</span>
+        <ol class="steps">
+          <li>5 sentences on what the text is <em>about</em> + why it's valued.</li>
+          <li>One critical reading.</li>
+          <li>Your view as a defendable thesis.</li>
+        </ol></td></tr>
+      <tr><td class="time">Eve<span class="clock">~7:30</span></td><td class="subj"><span class="tag t-bio">Biology</span> <span class="chip c-amber">AMBER</span></td><td><strong>Module 7 — Responses + Immunity.</strong> <span class="rx">Rec A</span> Low-key evening review.
+        <ol class="steps">
+          <li>Split a page: plant · animal · innate vs adaptive · primary vs secondary.</li>
+          <li>Condense each from notes.</li>
+          <li>Test: "how does the body respond after primary exposure?" from memory.</li>
+        </ol></td></tr>
+    </tbody></table>
+  </div>
+
+  <div class="day">
+    <div class="day-head"><span>Friday 17</span><span class="hrs">≈ 5–6 hrs · finish HMS + timed English</span></div>
+    <table><tbody>
+      <tr class="tguide"><td colspan="3">⏱ 8:00 gym/run · 9:00 Block 1 · 10:30 Block 2 · 11:45 lunch · 12:30 Block 3 · 2:00 Block 4 · ~4:00 walk at Bicentennial Park · ~6:00 dinner</td></tr>
+      <tr><td class="time">AM<span class="clock">8:00</span></td><td class="subj"><span class="tag t-move">Move</span></td><td>Gym or a run.</td></tr>
+      <tr><td class="time">Block 1<span class="clock">9:00</span></td><td class="subj"><span class="tag t-hms">HMS</span> <span class="chip c-amber">AMBER</span></td><td><strong>OECD + ageing + complementary.</strong> <span class="rx">Rec A</span>
+        <ol class="steps">
+          <li>Where Australia ranks + 2 reasons.</li>
+          <li>Healthy ageing + 2 strategies; one complementary approach.</li>
+          <li>Test each as a quick dot-point answer.</li>
+        </ol></td></tr>
+      <tr><td class="time">Block 2<span class="clock">10:30</span></td><td class="subj"><span class="tag t-eng">English</span></td><td><strong>Module C — Craft.</strong> <span class="rx">Rec E</span>
+        <ol class="steps">
+          <li>Pick one device from a mentor text.</li>
+          <li>Write a short piece to a past stimulus using it.</li>
+          <li>3–4 sentence reflection.</li>
+        </ol></td></tr>
+      <tr><td class="time"><span class="clock">11:45</span></td><td class="subj"><span class="tag t-rest">Lunch</span></td><td>Cook + break.</td></tr>
+      <tr><td class="time">Block 3<span class="clock">12:30</span></td><td class="subj"><span class="tag t-eng">English</span> <span class="tag t-mix">timed</span></td><td><strong>Common Module essay — timed.</strong> <span class="rx">Rec D</span> 5 plan · 35 write · 10 self-mark. Note your biggest fix.</td></tr>
+      <tr><td class="time">Block 4<span class="clock">2:00</span></td><td class="subj"><span class="tag t-va">Visual Arts</span> <span class="tag t-mix">timed</span></td><td><strong>Section I + case studies — keep it light.</strong> <span class="rx">Rec G + F</span> You're strong here, so this is a quick confidence check, not a deep dive. 3–4 timed short-answers, then top case studies up to 5+.</td></tr>
+    </tbody></table>
+  </div>
+
+  <div class="day">
+    <div class="day-head"><span>Saturday 18</span><span class="hrs">≈ 5–6 hrs · exam-condition practice</span></div>
+    <table><tbody>
+      <tr class="tguide"><td colspan="3">⏱ 8:00 gym · 9:00 Block 1 · 10:30 Block 2 · 11:45 lunch · 12:30 Block 3 · 2:00 Block 4 · ~4:00 walk at Bicentennial Park · ~6:00 dinner · eve re-colour §2–§5</td></tr>
+      <tr><td class="time">AM<span class="clock">8:00</span></td><td class="subj"><span class="tag t-move">Move</span></td><td>Gym — keep the streak.</td></tr>
+      <tr><td class="time">Block 1<span class="clock">9:00</span></td><td class="subj"><span class="tag t-bio">Biology</span> <span class="tag t-mix">timed</span></td><td><strong>Sit your one Bio past paper.</strong> <span class="rx">Rec D</span> Under time, then mark it. <strong>Zero in on the data-analysis questions</strong> — read the marking guidelines to see exactly how full-mark graph/table answers are worded. List every topic you lost marks on.</td></tr>
+      <tr><td class="time">Block 2<span class="clock">10:30</span></td><td class="subj"><span class="tag t-eng">English</span> <span class="tag t-mix">timed</span></td><td><strong>Module A or B — timed essay.</strong> <span class="rx">Rec D</span> Whichever felt weaker.</td></tr>
+      <tr><td class="time"><span class="clock">11:45</span></td><td class="subj"><span class="tag t-rest">Lunch</span></td><td>Cook + break.</td></tr>
+      <tr><td class="time">Block 3<span class="clock">12:30</span></td><td class="subj"><span class="tag t-hms">HMS</span></td><td><strong>Mixed reds + review.</strong> <span class="rx">Rec A + I</span> 2 past extended-responses (SDGs / healthcare), then flashcard rehab &amp; return-to-play + hydration.</td></tr>
+      <tr><td class="time">Block 4<span class="clock">2:00</span></td><td class="subj"><span class="tag t-va">Visual Arts</span> <span class="tag t-mix">timed</span></td><td><strong>Section II — one timed essay (light).</strong> <span class="rx">Rec H</span> Prove you can do it under pressure, then leave it — your hours pay off more on HMS logistics &amp; Bio data.</td></tr>
+      <tr><td class="time">Eve<span class="clock">~7pm</span></td><td class="subj"><span class="tag t-mix">Re-colour</span></td><td>Go back through §2–§5 and re-click your circles. Reds → green = proof it worked.</td></tr>
+    </tbody></table>
+  </div>
+
+  <div class="day off">
+    <div class="day-head"><span>Sunday 19</span><span class="hrs">Drive home · no study</span></div>
+    <table><tbody>
+      <tr><td class="time">—</td><td class="subj"><span class="tag t-rest">Travel</span></td><td>Rest day. You've done the work — go home fresh, not fried.</td></tr>
+    </tbody></table>
+  </div>
+</section>
+
+<section>
+  <h2><span class="num">§8</span>Five things that'll make the week work</h2>
+  <ul>
+    <li><strong>If you only remember one thing:</strong> close the notes and make yourself recall it. The struggle to remember <em>is</em> the learning.</li>
+    <li><strong>Do problems for problem subjects.</strong> Pedigrees, Punnett, allele frequencies — learned by doing (Recipe B).</li>
+    <li><strong>Time your essays.</strong> Running out of time is the #1 trial trap — that's why English gets short timed blocks (Recipe D).</li>
+    <li><strong>Protect the greens.</strong> One past question keeps a strong topic warm. Don't let comfy topics eat your red hours.</li>
+    <li><strong>Fuel it.</strong> Batch-cook so meals don't eat study time, keep the gym, and stop when a day's blocks are done.</li>
+  </ul>
+</section>
+
+<p class="foot">Built from your traffic-light scans · HMS &amp; Biology syllabuses (2023 / Stage 6) · NSW HSC English Advanced &amp; Visual Arts exam structures. Click any circle to re-colour; it saves in your browser.</p>
+
+</div>
+
+<script>
+(function(){
+  var COLORS=[
+    {k:'dg',c:'#1e7d3c',label:'Mastered'},
+    {k:'lg',c:'#6cc24a',label:'Good'},
+    {k:'yl',c:'#f4d03f',label:'OK'},
+    {k:'or',c:'#e88b1a',label:'Shaky'},
+    {k:'rd',c:'#e4572e',label:'Weak'}
+  ];
+  var STORE='hscTraffic_v1', state={};
+  try{ state=JSON.parse(localStorage.getItem(STORE))||{}; }catch(e){ state={}; }
+  function save(){ try{ localStorage.setItem(STORE,JSON.stringify(state)); }catch(e){} }
+  function colorFor(k){ for(var i=0;i<COLORS.length;i++){ if(COLORS[i].k===k) return COLORS[i].c; } return ''; }
+  var SUBJECTS=[{k:'hms',n:'HMS'},{k:'bio',n:'Biology'},{k:'eng',n:'English'},{k:'va',n:'Visual Arts'}];
+  function classify(k){ if(k==='dg'||k==='lg')return 'strong'; if(k==='yl')return 'ok'; if(k==='or'||k==='rd')return 'weak'; return 'none'; }
+  var btns=Array.prototype.slice.call(document.querySelectorAll('.tl'));
+  function paint(b){
+    var k=state[b.getAttribute('data-id')];
+    if(k){ b.style.background=colorFor(k); b.classList.add('set'); }
+    else { b.style.background='transparent'; b.classList.remove('set'); }
+  }
+  // palette popover
+  var pal=document.createElement('div'); pal.className='palette';
+  COLORS.forEach(function(col){
+    var d=document.createElement('button'); d.type='button'; d.className='pal-dot';
+    d.style.background=col.c; d.title=col.label; d.setAttribute('data-k',col.k); pal.appendChild(d);
+  });
+  var clr=document.createElement('button'); clr.type='button'; clr.className='pal-clear'; clr.textContent='✕'; clr.title='Clear'; pal.appendChild(clr);
+  document.body.appendChild(pal);
+  var active=null;
+  function openPal(b){
+    active=b; var r=b.getBoundingClientRect();
+    pal.style.display='flex';
+    var pw=pal.offsetWidth||210, vw=document.documentElement.clientWidth;
+    var left=r.left+window.scrollX-6; if(left+pw>window.scrollX+vw-8) left=window.scrollX+vw-pw-8; if(left<8) left=8;
+    pal.style.top=(r.bottom+window.scrollY+6)+'px'; pal.style.left=left+'px';
+  }
+  function closePal(){ pal.style.display='none'; active=null; }
+  pal.addEventListener('click',function(e){
+    var t=e.target;
+    if(t.classList.contains('pal-dot')&&active){ state[active.getAttribute('data-id')]=t.getAttribute('data-k'); paint(active); save(); update(); closePal(); }
+    else if(t.classList.contains('pal-clear')&&active){ delete state[active.getAttribute('data-id')]; paint(active); save(); update(); closePal(); }
+  });
+  document.addEventListener('click',function(e){
+    var t=e.target;
+    if(t.classList&&t.classList.contains('tl')){ e.stopPropagation(); if(active===t) closePal(); else openPal(t); return; }
+    if(!pal.contains(t)) closePal();
+  });
+  window.addEventListener('resize',closePal);
+  window.addEventListener('scroll',closePal,true);
+  function tally(){
+    var c={dg:0,lg:0,yl:0,or:0,rd:0,none:0};
+    btns.forEach(function(b){ var k=state[b.getAttribute('data-id')]; if(k&&c[k]!=null) c[k]++; else c.none++; });
+    var el=document.getElementById('tally');
+    if(el) el.innerHTML='Overall: <b>'+c.dg+'</b> mastered · <b>'+c.lg+'</b> good · <b>'+c.yl+'</b> ok · <b>'+c.or+'</b> shaky · <b>'+c.rd+'</b> weak · <b>'+c.none+'</b> untracked';
+  }
+  function renderSubjStats(){
+    var box=document.getElementById('subjstats'); if(!box) return;
+    var data={}; SUBJECTS.forEach(function(s){ data[s.k]={weak:0,ok:0,strong:0,none:0,total:0}; });
+    btns.forEach(function(b){ var s=b.getAttribute('data-subj'); if(!data[s])return; data[s][classify(state[b.getAttribute('data-id')])]++; data[s].total++; });
+    var worst=null,ws=-1;
+    SUBJECTS.forEach(function(s){ var d=data[s.k]; if(d.total-d.none>0){ var sc=(d.weak*2+d.ok)/d.total; if(sc>ws){ws=sc;worst=s.k;} } });
+    var html='';
+    SUBJECTS.forEach(function(s){
+      var d=data[s.k], t=d.total||1;
+      var wp=Math.round(d.weak/t*100), op=Math.round(d.ok/t*100), sp=Math.round(d.strong/t*100);
+      html+='<div><div class="substat-top"><span class="nm">'+s.n+(s.k===worst?' <span class="needwork">needs most work</span>':'')+'</span>'+
+        '<span class="pc"><span class="w">'+wp+'%</span> weak · <span class="o">'+op+'%</span> ok · <span class="s">'+sp+'%</span> strong</span></div>'+
+        '<div class="bar"><i class="sW" style="width:'+(d.weak/t*100)+'%"></i><i class="sO" style="width:'+(d.ok/t*100)+'%"></i><i class="sS" style="width:'+(d.strong/t*100)+'%"></i></div></div>';
+    });
+    box.innerHTML=html;
+  }
+  function update(){ tally(); renderSubjStats(); }
+  btns.forEach(paint); update();
+  var rb=document.getElementById('resetBtn');
+  if(rb) rb.addEventListener('click',function(){ if(confirm('Clear all your colours?')){ state={}; save(); btns.forEach(paint); update(); } });
+  var pb=document.getElementById('printBtn');
+  if(pb) pb.addEventListener('click',function(){ window.print(); });
+})();
+</script>
+</body>
+</html>
