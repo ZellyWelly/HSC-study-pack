@@ -142,9 +142,13 @@
   <p style="font-size:.78rem; color:var(--muted); margin:2px 0 0;">Overall across all four subjects — weak (orange+red) high = study there first.</p>
   <div id="tally">Loading your progress…</div>
   <div style="margin-top:8px;">
+    <button class="ctrlbtn" id="saveBtn">💾 Save to file</button>
+    <button class="ctrlbtn" id="loadBtn">📂 Load from file</button>
     <button class="ctrlbtn" id="printBtn">🖨 Print</button>
     <button class="ctrlbtn" id="resetBtn">↺ Reset all colours</button>
+    <input type="file" id="importFile" accept="application/json,.json" style="display:none">
   </div>
+  <p style="font-size:.75rem; color:var(--muted); margin:8px 0 0;">💾 <strong>Save to file</strong> downloads your progress as a backup you can keep or move to another computer · 📂 <strong>Load from file</strong> brings it back. Your colours also auto-save in this browser as you go.</p>
   <div class="callout" style="margin-top:14px;"><strong>Two things to know:</strong> the coloured word-chips in the tables (<span class="chip c-red">RED</span> <span class="chip c-amber">AMBER</span> <span class="chip c-green">GREEN</span>) are <em>my</em> suggested priority — they don't change. The circles in the "You" column are <em>yours</em> to set. And to make your colours stick between sessions, <strong>download this file and open it in your browser</strong> (Chrome/Safari) — that's where it remembers everything.</div>
 </section>
 
@@ -713,6 +717,41 @@
   if(rb) rb.addEventListener('click',function(){ if(confirm('Clear all your colours?')){ state={}; save(); btns.forEach(paint); update(); } });
   var pb=document.getElementById('printBtn');
   if(pb) pb.addEventListener('click',function(){ window.print(); });
+
+  // Save progress to a file — a backup you can keep or move to another computer
+  var sb=document.getElementById('saveBtn');
+  if(sb) sb.addEventListener('click',function(){
+    var payload={ app:'hsc-study-pack', version:1, savedAt:new Date().toISOString(), progress:state };
+    var blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
+    var url=URL.createObjectURL(blob);
+    var d=new Date(), pad=function(n){return (n<10?'0':'')+n;};
+    var a=document.createElement('a');
+    a.href=url; a.download='hsc-progress-'+d.getFullYear()+pad(d.getMonth()+1)+pad(d.getDate())+'.json';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(function(){ URL.revokeObjectURL(url); },1000);
+  });
+
+  // Load progress from a file
+  var lb=document.getElementById('loadBtn'), fi=document.getElementById('importFile');
+  if(lb&&fi){
+    lb.addEventListener('click',function(){ fi.value=''; fi.click(); });
+    fi.addEventListener('change',function(){
+      var f=fi.files&&fi.files[0]; if(!f) return;
+      var reader=new FileReader();
+      reader.onload=function(){
+        try{
+          var data=JSON.parse(reader.result);
+          var incoming=(data&&data.progress)?data.progress:data;
+          if(!incoming||typeof incoming!=='object'||Array.isArray(incoming)){ alert("That file doesn't look like a saved HSC progress file."); return; }
+          var count=Object.keys(incoming).length;
+          if(!confirm('Load '+count+' saved colour'+(count===1?'':'s')+'? This replaces the colours currently showing.')) return;
+          state=incoming; save(); btns.forEach(paint); update();
+          alert('Loaded your saved progress ✓');
+        }catch(e){ alert("Sorry — that file couldn't be read. Make sure it's a Save-to-file JSON from this app."); }
+      };
+      reader.readAsText(f);
+    });
+  }
 })();
 </script>
 </body>
