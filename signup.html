@@ -208,7 +208,7 @@
     if (code.length < 6){ setMsg("Enter the 6-digit code from your email.", "err"); return; }
     setMsg("Checking your code…");
     function finish(r){ setMsg("Verified — loading your plan…", "ok"); var u = r.data && (r.data.user || (r.data.session && r.data.session.user)); routeAfterAuth(u); }
-    supa.auth.verifyOtp({ email: pendingEmail, token: code, type: "email" }).then(function(res){
+    supa.auth.verifyOtp({ email: pendingEmail, token: code, type: "signup" }).then(function(res){
       if (!res.error && res.data && (res.data.session || res.data.user)){ finish(res); return; }
       supa.auth.verifyOtp({ email: pendingEmail, token: code, type: "signup" }).then(function(res2){
         if (res2.error || !(res2.data && (res2.data.session || res2.data.user))){ setMsg((res2.error && res2.error.message) || "That code didn't work — double-check it and try again.", "err"); return; }
