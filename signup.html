@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Zelly — Save your progress</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --base:#0D0E12; --lime:#78E83E; --lime-deep:#4FCE2C; --mint:#B4F3AE; --teal:#39E6C4;
+    --ink:#F2F4F0; --ink-soft:#9CA39A; --card:#16181D; --card-2:#1B1E24;
+    --edge:rgba(242,244,240,.10); --edge-soft:rgba(242,244,240,.06);
+    --display:"Anton","Arial Black",system-ui,sans-serif;
+    --sans:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{background:radial-gradient(1100px 620px at 50% -12%, #13291c 0%, var(--base) 58%);
+    color:var(--ink); font-family:var(--sans); min-height:100vh; display:flex; flex-direction:column;}
+  a{color:inherit;}
+  /* header */
+  .nav{padding:20px 26px;}
+  .wordmark{display:inline-flex; align-items:center; gap:11px; text-decoration:none;}
+  .wordmark .dot{width:15px;height:15px;border-radius:50%;
+    background:conic-gradient(from 0deg,var(--lime-deep),var(--teal),var(--mint),var(--lime),var(--lime-deep));
+    box-shadow:0 0 16px rgba(134,224,30,.6); animation:spin 7s linear infinite;}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .wm-name{font-weight:800; letter-spacing:-.02em; font-size:18px; color:var(--ink); line-height:1;}
+  .wm-tag{font-weight:600; font-size:11px; letter-spacing:.05em; text-transform:uppercase; color:var(--ink-soft); margin-top:3px;}
+  .wm-text{display:flex; flex-direction:column;}
+  /* centre stage */
+  .stage{flex:1; display:flex; align-items:center; justify-content:center; padding:24px 20px 60px;}
+  .card{width:min(440px,100%); background:var(--card); border:1px solid var(--edge); border-radius:22px;
+    padding:34px 30px; box-shadow:0 30px 70px -30px rgba(0,0,0,.7);}
+  .eyebrow{display:inline-flex; align-items:center; gap:8px; font-weight:800; font-size:11.5px; letter-spacing:.12em;
+    text-transform:uppercase; color:var(--lime); background:rgba(120,232,62,.1); border:1px solid rgba(120,232,62,.28);
+    padding:7px 13px; border-radius:100px; margin-bottom:18px;}
+  h1{font-weight:800; font-size:27px; letter-spacing:-.02em; line-height:1.1; margin-bottom:10px;}
+  h1 em{font-style:normal; background:linear-gradient(100deg,var(--lime),var(--teal)); -webkit-background-clip:text; background-clip:text; color:transparent;}
+  .lead{color:var(--ink-soft); font-size:14.5px; line-height:1.55; margin-bottom:22px;}
+  .perks{list-style:none; display:flex; flex-direction:column; gap:9px; margin-bottom:24px;}
+  .perks li{display:flex; align-items:flex-start; gap:10px; font-size:13.5px; color:var(--ink); line-height:1.45;}
+  .perks .pk{flex:0 0 auto; width:18px; height:18px; margin-top:1px; color:var(--lime);}
+  label{display:block; font-size:11px; font-weight:800; letter-spacing:.06em; text-transform:uppercase; color:var(--ink-soft); margin:14px 0 6px;}
+  input{width:100%; background:var(--base); border:1px solid var(--edge); border-radius:11px; padding:13px 14px;
+    color:var(--ink); font-size:15px; font-family:inherit; outline:none; transition:border-color .15s, box-shadow .15s;}
+  input:focus{border-color:rgba(120,232,62,.6); box-shadow:0 0 0 3px rgba(120,232,62,.14);}
+  .row{display:flex; gap:10px; margin-top:20px;}
+  .row button{flex:1; border-radius:11px; padding:13px; font-family:inherit; font-size:14.5px; font-weight:800; cursor:pointer; border:1px solid transparent; transition:filter .15s, border-color .15s;}
+  .btn-primary{background:var(--lime); color:#0D0E12;}
+  .btn-primary:hover{filter:brightness(1.06);}
+  .btn-ghost{background:transparent; color:var(--ink); border-color:var(--edge);}
+  .btn-ghost:hover{border-color:rgba(242,244,240,.28);}
+  .msg{margin-top:14px; font-size:13px; line-height:1.45; min-height:1em;}
+  .msg.err{color:#ff9d7a;} .msg.ok{color:var(--mint);}
+  .divider{display:flex; align-items:center; gap:12px; margin:24px 0 4px; color:var(--ink-soft); font-size:12px;}
+  .divider::before,.divider::after{content:""; height:1px; flex:1; background:var(--edge);}
+  .skip{display:block; text-align:center; margin-top:16px;}
+  .skip a{color:var(--ink-soft); font-size:13px; font-weight:700; text-decoration:none; border-bottom:1px dashed rgba(242,244,240,.25); padding-bottom:1px;}
+  .skip a:hover{color:var(--teal); border-color:var(--teal);}
+  .foot-note{margin-top:20px; font-size:11.5px; color:#6b7169; line-height:1.5; text-align:center;}
+</style>
+</head>
+<body>
+  <header class="nav">
+    <a class="wordmark" href="index.html"><span class="dot"></span><span class="wm-text"><span class="wm-name">Zelly</span><span class="wm-tag">HSC Study Companion</span></span></a>
+  </header>
+
+  <main class="stage">
+    <div class="card">
+      <span class="eyebrow">◆ Save your progress</span>
+      <h1>Make a free account so your <em>plan sticks.</em></h1>
+      <p class="lead">Set up your plan once and pick it up on any device — your traffic-lights, priorities, ticked-off blocks and study plan all save to your account.</p>
+      <ul class="perks">
+        <li><span class="pk"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span>Your plan &amp; progress sync across laptop and phone</li>
+        <li><span class="pk"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span>Nothing lost if you clear your browser</li>
+        <li><span class="pk"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span>Free — takes about 20 seconds</li>
+      </ul>
+
+      <div id="authSection">
+        <label for="name">Your name</label>
+        <input type="text" id="name" autocomplete="given-name" placeholder="e.g. Olivia" />
+        <label for="email">Email</label>
+        <input type="email" id="email" autocomplete="email" placeholder="you@example.com" />
+        <label for="pass">Password</label>
+        <input type="password" id="pass" autocomplete="current-password" placeholder="At least 6 characters" />
+
+        <div class="row">
+          <button type="button" class="btn-primary" id="signupBtn">Create account</button>
+          <button type="button" class="btn-ghost" id="loginBtn">Log in</button>
+        </div>
+      </div>
+
+      <div id="codeSection" hidden>
+        <label for="code">Enter the 6-digit code we emailed you</label>
+        <input type="text" id="code" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="123456" />
+        <div class="row">
+          <button type="button" class="btn-primary" id="verifyBtn">Verify &amp; continue</button>
+          <button type="button" class="btn-ghost" id="resendBtn">Resend code</button>
+        </div>
+        <div class="skip" style="margin-top:12px"><a href="#" id="backLink">&larr; Use a different email</a></div>
+      </div>
+
+      <p class="msg" id="msg"></p>
+
+      <div class="divider">or</div>
+      <div class="skip"><a href="start.html" id="skipLink">Skip for now — set up my plan without an account &rarr;</a></div>
+
+      <p class="foot-note">By continuing you agree to let Zelly save your study data to your account. You can delete it any time.</p>
+    </div>
+  </main>
+
+<!-- Supabase auth (same project as the tracker). Config is public & safe with RLS on. -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+(function(){
+  "use strict";
+  var CLOUD = {
+    url: "https://gwkvhlgylgnxnohjyzqk.supabase.co",
+    key: "sb_publishable_atvVVTrav3V-ya--Azpt_A_jtMTvlvz"
+  };
+  var NEXT = "start.html"; // where we send people once they're in
+  var nameEl = document.getElementById("name");
+  var email  = document.getElementById("email");
+  var pass   = document.getElementById("pass");
+  var codeEl = document.getElementById("code");
+  var msgEl  = document.getElementById("msg");
+  var authSection = document.getElementById("authSection");
+  var codeSection = document.getElementById("codeSection");
+  var pendingEmail = "", pendingName = "";
+  function setMsg(t, kind){ msgEl.textContent = t || ""; msgEl.className = "msg" + (kind ? " " + kind : ""); }
+  function stashName(n){ try { if (n) localStorage.setItem("hscName", n); } catch(e){} }
+  function showCodeStep(em){ pendingEmail = em || pendingEmail; authSection.hidden = true; codeSection.hidden = false; setTimeout(function(){ codeEl.focus(); }, 30); }
+  function showAuthStep(){ codeSection.hidden = true; authSection.hidden = false; setMsg(""); }
+
+  // no supabase (offline / not loaded yet) → buttons fall back to just continuing to the plan
+  if (!window.supabase || !CLOUD.url || !CLOUD.key){
+    document.getElementById("signupBtn").addEventListener("click", function(){ stashName(nameEl.value.trim()); location.href = NEXT; });
+    document.getElementById("loginBtn").addEventListener("click", function(){ location.href = NEXT; });
+    return;
+  }
+  var supa = window.supabase.createClient(CLOUD.url, CLOUD.key);
+
+  // Pull this account's saved data down into the browser, then route: returning users (who
+  // already have a plan) go straight to their tracker; brand-new accounts go to build a plan.
+  function routeAfterAuth(user){
+    if (!user){ location.href = NEXT; return; }
+    try { var nm = (user.user_metadata && user.user_metadata.name) || pendingName; if (nm) localStorage.setItem("hscName", nm); } catch(e){}
+    supa.from("profiles").select("data").eq("id", user.id).maybeSingle().then(function(pr){
+      var d = (pr && pr.data && pr.data.data) || null;
+      if (d){
+        try {
+          if (d.traffic)    localStorage.setItem("hscTraffic_v1",   JSON.stringify(d.traffic));
+          if (d.priority)   localStorage.setItem("hscPriority_v1",  JSON.stringify(d.priority));
+          if (d.onboarding) localStorage.setItem("hscOnboarding_v1",JSON.stringify(d.onboarding));
+          if (d.done)       localStorage.setItem("hscDone_v1",      JSON.stringify(d.done));
+          localStorage.setItem("hscSyncMeta", JSON.stringify({ updatedAt: (new Date()).getTime() }));
+        } catch(e){}
+      }
+      var onb = d && d.onboarding;
+      var hasPlan = !!(onb && (((onb.subjects||[]).length > 0) || ((onb.plan||[]).length > 0)));
+      location.href = hasPlan ? "app.html" : "start.html";
+    }, function(){ location.href = NEXT; }); // query failed → just go build a plan
+  }
+
+  // already signed in? route them onward (to their plan if they have one)
+  supa.auth.getSession().then(function(res){ if (res.data && res.data.session){ routeAfterAuth(res.data.session.user); } });
+
+  function need(requireName){
+    var e = email.value.trim(), p = pass.value, n = nameEl.value.trim();
+    if (requireName && !n){ setMsg("What should we call you? Pop your name in.", "err"); return null; }
+    if (!e || !p){ setMsg("Enter your email and a password.", "err"); return null; }
+    return { e: e, p: p, n: n };
+  }
+
+  // ---- log in (existing account) ----
+  document.getElementById("loginBtn").addEventListener("click", function(){
+    var v = need(false); if (!v) return;
+    setMsg("Signing in…");
+    supa.auth.signInWithPassword({ email: v.e, password: v.p }).then(function(res){
+      if (res.error){
+        // account exists but the email isn't confirmed yet → let them finish with the code
+        if (/confirm/i.test(res.error.message || "")){ setMsg("Almost there — enter the code we emailed you.", "ok"); showCodeStep(v.e); return; }
+        setMsg(res.error.message, "err"); return;
+      }
+      setMsg("You’re in — loading your plan…", "ok");
+      routeAfterAuth(res.data && res.data.user);
+    });
+  });
+
+  // ---- create account (asks name, then verifies with an emailed code) ----
+  document.getElementById("signupBtn").addEventListener("click", function(){
+    var v = need(true); if (!v) return;
+    if (v.p.length < 6){ setMsg("Password needs to be at least 6 characters.", "err"); return; }
+    pendingEmail = v.e; pendingName = v.n; stashName(v.n);
+    setMsg("Creating your account…");
+    supa.auth.signUp({ email: v.e, password: v.p, options: { data: { name: v.n } } }).then(function(res){
+      if (res.error){ setMsg(res.error.message, "err"); return; }
+      if (res.data && res.data.session){ setMsg("Account created — let’s build your plan…", "ok"); routeAfterAuth(res.data.session.user); }
+      else { setMsg("We emailed a 6-digit code to " + v.e + ". Pop it in below to finish.", "ok"); showCodeStep(v.e); }
+    });
+  });
+
+  // ---- verify the emailed code (tries both Supabase type names so it works either way) ----
+  document.getElementById("verifyBtn").addEventListener("click", function(){
+    var code = (codeEl.value || "").replace(/\s/g, "");
+    if (code.length < 6){ setMsg("Enter the 6-digit code from your email.", "err"); return; }
+    setMsg("Checking your code…");
+    function finish(r){ setMsg("Verified — loading your plan…", "ok"); var u = r.data && (r.data.user || (r.data.session && r.data.session.user)); routeAfterAuth(u); }
+    supa.auth.verifyOtp({ email: pendingEmail, token: code, type: "email" }).then(function(res){
+      if (!res.error && res.data && (res.data.session || res.data.user)){ finish(res); return; }
+      supa.auth.verifyOtp({ email: pendingEmail, token: code, type: "signup" }).then(function(res2){
+        if (res2.error || !(res2.data && (res2.data.session || res2.data.user))){ setMsg((res2.error && res2.error.message) || "That code didn't work — double-check it and try again.", "err"); return; }
+        finish(res2);
+      });
+    });
+  });
+
+  // ---- resend the code ----
+  document.getElementById("resendBtn").addEventListener("click", function(){
+    if (!pendingEmail){ showAuthStep(); return; }
+    setMsg("Sending a fresh code…");
+    supa.auth.resend({ type: "signup", email: pendingEmail }).then(function(res){
+      setMsg(res && res.error ? res.error.message : "New code sent — check your email.", res && res.error ? "err" : "ok");
+    });
+  });
+
+  // ---- back to the email / password step ----
+  document.getElementById("backLink").addEventListener("click", function(ev){ ev.preventDefault(); showAuthStep(); });
+})();
+</script>
+</body>
+</html>

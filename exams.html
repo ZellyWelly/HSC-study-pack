@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Zelly — Your exam timetable</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --base:#0D0E12; --lime:#78E83E; --lime-deep:#4FCE2C; --mint:#B4F3AE; --teal:#39E6C4;
+    --ink:#F2F4F0; --ink-soft:#9CA39A; --card:#16181D; --card-2:#1B1E24;
+    --edge:rgba(242,244,240,.10); --edge-soft:rgba(242,244,240,.06);
+    --sans:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{background:radial-gradient(1100px 620px at 50% -12%, #13291c 0%, var(--base) 58%);
+    color:var(--ink); font-family:var(--sans); min-height:100vh;}
+  a{color:inherit;}
+  .nav{padding:20px 26px;}
+  .wordmark{display:inline-flex; align-items:center; gap:11px; text-decoration:none;}
+  .wordmark .dot{width:15px;height:15px;border-radius:50%;
+    background:conic-gradient(from 0deg,var(--lime-deep),var(--teal),var(--mint),var(--lime),var(--lime-deep));
+    box-shadow:0 0 16px rgba(134,224,30,.6); animation:spin 7s linear infinite;}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .wm-text{display:flex; flex-direction:column;}
+  .wm-name{font-weight:800; letter-spacing:-.02em; font-size:18px; line-height:1;}
+  .wm-tag{font-weight:600; font-size:11px; letter-spacing:.05em; text-transform:uppercase; color:var(--ink-soft); margin-top:3px;}
+  .wrap{max-width:640px; margin:0 auto; padding:14px 20px 70px;}
+  .eyebrow{display:inline-flex; align-items:center; gap:8px; font-weight:800; font-size:11.5px; letter-spacing:.12em;
+    text-transform:uppercase; color:var(--lime); background:rgba(120,232,62,.1); border:1px solid rgba(120,232,62,.28);
+    padding:7px 13px; border-radius:100px; margin-bottom:18px;}
+  h1{font-weight:800; font-size:28px; letter-spacing:-.02em; line-height:1.08; margin-bottom:10px;}
+  h1 em{font-style:normal; background:linear-gradient(100deg,var(--lime),var(--teal)); -webkit-background-clip:text; background-clip:text; color:transparent;}
+  .lead{color:var(--ink-soft); font-size:14.5px; line-height:1.55; margin-bottom:22px; max-width:56ch;}
+  .reorder-hint{display:flex; align-items:center; gap:8px; font-size:12.5px; color:var(--ink-soft);
+    background:var(--card-2); border:1px solid var(--edge-soft); border-radius:10px; padding:10px 13px; margin-bottom:16px;}
+  .reorder-hint b{color:var(--ink); font-weight:700;}
+
+  .exam-row{display:flex; align-items:stretch; gap:12px; padding:14px 14px 14px 10px; background:var(--card);
+    border:1px solid var(--edge); border-radius:14px; margin-bottom:11px; transition:opacity .18s, transform .18s;}
+  .exam-row.moving{opacity:.55;}
+  /* reorder column */
+  .reorder{display:flex; flex-direction:column; justify-content:center; gap:5px; flex:0 0 auto;}
+  .reorder button{width:30px; height:26px; border-radius:8px; border:1px solid var(--edge);
+    background:var(--card-2); color:var(--ink-soft); cursor:pointer; display:flex; align-items:center; justify-content:center;
+    padding:0; transition:background .14s, color .14s, border-color .14s;}
+  .reorder button:hover:not(:disabled){background:rgba(120,232,62,.12); color:var(--lime); border-color:rgba(120,232,62,.4);}
+  .reorder button:disabled{opacity:.3; cursor:default;}
+  .reorder button svg{width:14px; height:14px;}
+  .pos{font-size:10.5px; font-weight:800; color:var(--ink-soft); text-align:center; margin:1px 0;}
+
+  /* body of the row */
+  .rbody{flex:1; min-width:0; display:flex; flex-direction:column; gap:10px;}
+  .rbody .sname{font-weight:800; font-size:15.5px; line-height:1.2;}
+  .fields{display:flex; flex-wrap:wrap; gap:10px;}
+  .paper{display:flex; flex-direction:column; gap:6px; flex:1 1 auto; min-width:0;}
+  .paper .plabel{font-size:10.5px; font-weight:800; letter-spacing:.06em; text-transform:uppercase; color:var(--teal);}
+  .paper .inputs{display:flex; gap:9px; flex-wrap:wrap;}
+  .exam-row input[type=date]{background:var(--base); border:1px solid var(--edge); border-radius:10px;
+    padding:11px 12px; color:var(--ink); font-family:inherit; font-size:14px; outline:none; color-scheme:dark; flex:1 1 150px; min-width:150px;}
+  .exam-row input[type=time]{background:var(--base); border:1px solid var(--edge); border-radius:10px;
+    padding:11px 12px; color:var(--ink); font-family:inherit; font-size:14px; outline:none; color-scheme:dark; flex:0 0 auto; min-width:130px; width:130px;}
+  .exam-row input:focus{border-color:rgba(120,232,62,.55);}
+
+  .actions{display:flex; gap:12px; margin-top:26px; flex-wrap:wrap;}
+  .btn{border-radius:12px; padding:14px 22px; font-family:inherit; font-size:15px; font-weight:800; cursor:pointer; border:1px solid transparent; text-decoration:none; display:inline-flex; align-items:center; gap:8px;}
+  .btn-primary{background:var(--lime); color:#0D0E12;} .btn-primary:hover{filter:brightness(1.06);}
+  .btn-ghost{background:transparent; color:var(--ink); border-color:var(--edge);} .btn-ghost:hover{border-color:rgba(242,244,240,.28);}
+  .hint{margin-top:16px; font-size:12.5px; color:var(--ink-soft); line-height:1.5;}
+  .empty{background:var(--card); border:1px solid var(--edge); border-radius:16px; padding:26px; text-align:center; color:var(--ink-soft);}
+  .empty a{color:var(--lime); font-weight:700;}
+</style>
+</head>
+<body>
+  <header class="nav">
+    <a class="wordmark" href="app.html"><span class="dot"></span><span class="wm-text"><span class="wm-name">Zelly</span><span class="wm-tag">HSC Study Companion</span></span></a>
+  </header>
+  <div class="wrap">
+    <span class="eyebrow">◆ Exam timetable</span>
+    <h1 id="head">When are your <em>exams?</em></h1>
+    <p class="lead">Add the date each subject's exam falls on. Zelly will lean your study toward whatever's coming up soonest — without dropping the later subjects. Leave a date blank if you don't know it yet.</p>
+    <div class="reorder-hint" id="rehint" hidden>
+      <span>↕</span><span>Use the arrows to put your subjects in order — <b>soonest exam at the top</b>. It's a handy sanity-check on your dates.</span>
+    </div>
+    <div id="host"></div>
+    <div class="actions" id="actions" hidden>
+      <button type="button" class="btn btn-primary" id="saveBtn">Save &amp; update my plan &rarr;</button>
+      <a class="btn btn-ghost" href="app.html">Back to my plan</a>
+    </div>
+    <p class="hint" id="hint" hidden>Tip: even one or two dates helps — the plan will weight those subjects toward their exam while keeping the rest ticking over.</p>
+  </div>
+
+<script>
+(function(){
+  "use strict";
+  var NAMES = {
+    hms:"Health & Movement Science", bio:"Biology", chem:"Chemistry", phys:"Physics",
+    math2:"Mathematics Advanced/Ext", matha:"Mathematics Standard", bus:"Business Studies",
+    legal:"Legal Studies", cafs:"CAFS", modhist:"Modern History", anchist:"Ancient History",
+    sor:"Studies of Religion", eng:"English Advanced", engst:"English Standard", va:"Visual Arts"
+  };
+  // Subjects that sit two separate written papers in the HSC (confirmed against NESA:
+  // only English Standard & English Advanced have Paper 1 + Paper 2 on different days).
+  var MULTI = {
+    eng:   ["Paper 1", "Paper 2"],
+    engst: ["Paper 1", "Paper 2"]
+  };
+
+  var KEY = "hscOnboarding_v1";
+  var blob = null; try { blob = JSON.parse(localStorage.getItem(KEY)); } catch(e){ blob = null; }
+  var host = document.getElementById("host");
+
+  if (!blob || !Array.isArray(blob.subjects) || !blob.subjects.length){
+    host.innerHTML = '<div class="empty">You need to set up your plan first — then you can add your exam dates.<br><br><a href="start.html">Set up my plan &rarr;</a></div>';
+    return;
+  }
+
+  // exam type in the heading (remembered from setup)
+  var typeLabel = blob.examType === "hsc" ? "HSC" : (blob.examType === "trials" ? "Trials" : null);
+  if (typeLabel) document.getElementById("head").innerHTML = "When are your <em>" + typeLabel + " exams?</em>";
+
+  var existingDates = (blob.examDates && typeof blob.examDates === "object") ? blob.examDates : {};
+  var existingTimes = (blob.examTimes && typeof blob.examTimes === "object") ? blob.examTimes : {};
+
+  // working copy of the order (mutated by the reorder arrows, saved on Save)
+  var order = blob.subjects.slice();
+
+  function esc(s){ return String(s).replace(/[&<>"]/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c]; }); }
+
+  // pull an existing value out of storage whether it was saved as a string or an array
+  function valAt(store, k, idx){
+    var v = store[k];
+    if (v == null) return "";
+    if (Array.isArray(v)) return v[idx] || "";
+    return idx === 0 ? v : "";  // legacy single value lives in slot 0
+  }
+
+  var UP = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M18 15l-6-6-6 6"/></svg>';
+  var DN = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>';
+
+  function paperHtml(k, idx, label){
+    var d = valAt(existingDates, k, idx);
+    var t = valAt(existingTimes, k, idx);
+    var lab = label
+      ? '<span class="plabel">' + esc(label) + '</span>'
+      : '';
+    return '<div class="paper">' + lab +
+      '<div class="inputs">' +
+        '<input type="date" class="ex-date" data-idx="' + idx + '" value="' + esc(d) + '" aria-label="' + esc(NAMES[k]||k) + (label?" "+esc(label):"") + ' exam date">' +
+        '<input type="time" class="ex-time" data-idx="' + idx + '" value="' + esc(t) + '" aria-label="' + esc(NAMES[k]||k) + (label?" "+esc(label):"") + ' exam time (optional)">' +
+      '</div>' +
+    '</div>';
+  }
+
+  function render(){
+    host.innerHTML = "";
+    order.forEach(function(k, i){
+      var row = document.createElement("div");
+      row.className = "exam-row"; row.setAttribute("data-key", k);
+      var nm = NAMES[k] || k;
+      var papers = MULTI[k];
+      var fields;
+      if (papers){
+        fields = papers.map(function(lbl, idx){ return paperHtml(k, idx, lbl); }).join("");
+      } else {
+        fields = paperHtml(k, 0, "");
+      }
+      row.innerHTML =
+        '<div class="reorder">' +
+          '<button type="button" class="up" ' + (i === 0 ? "disabled" : "") + ' aria-label="Move ' + esc(nm) + ' up">' + UP + '</button>' +
+          '<div class="pos">' + (i + 1) + '</div>' +
+          '<button type="button" class="down" ' + (i === order.length - 1 ? "disabled" : "") + ' aria-label="Move ' + esc(nm) + ' down">' + DN + '</button>' +
+        '</div>' +
+        '<div class="rbody">' +
+          '<span class="sname">' + esc(nm) + '</span>' +
+          '<div class="fields">' + fields + '</div>' +
+        '</div>';
+      host.appendChild(row);
+    });
+  }
+
+  // read the current DOM values back into memory so a reorder doesn't wipe typed-but-unsaved input
+  function harvest(){
+    Array.prototype.forEach.call(host.querySelectorAll(".exam-row"), function(row){
+      var k = row.getAttribute("data-key");
+      var dEls = row.querySelectorAll(".ex-date");
+      var tEls = row.querySelectorAll(".ex-time");
+      if (MULTI[k]){
+        var dArr = [], tArr = [];
+        Array.prototype.forEach.call(dEls, function(el){ dArr[+el.getAttribute("data-idx")] = el.value; });
+        Array.prototype.forEach.call(tEls, function(el){ tArr[+el.getAttribute("data-idx")] = el.value; });
+        existingDates[k] = dArr; existingTimes[k] = tArr;
+      } else {
+        existingDates[k] = dEls[0] ? dEls[0].value : "";
+        existingTimes[k] = tEls[0] ? tEls[0].value : "";
+      }
+    });
+  }
+
+  host.addEventListener("click", function(ev){
+    var btn = ev.target.closest("button");
+    if (!btn) return;
+    var row = ev.target.closest(".exam-row");
+    if (!row) return;
+    var k = row.getAttribute("data-key");
+    var i = order.indexOf(k);
+    if (i < 0) return;
+    harvest();  // keep whatever's typed before we re-render
+    if (btn.classList.contains("up") && i > 0){
+      order.splice(i, 1); order.splice(i - 1, 0, k);
+    } else if (btn.classList.contains("down") && i < order.length - 1){
+      order.splice(i, 1); order.splice(i + 1, 0, k);
+    } else { return; }
+    render();
+  });
+
+  render();
+  document.getElementById("rehint").hidden = false;
+  document.getElementById("actions").hidden = false;
+  document.getElementById("hint").hidden = false;
+
+  document.getElementById("saveBtn").addEventListener("click", function(){
+    harvest();
+    var dates = {}, times = {};
+    order.forEach(function(k){
+      if (MULTI[k]){
+        var dArr = (existingDates[k] || []).map(function(x){ return x || ""; });
+        var tArr = (existingTimes[k] || []).map(function(x){ return x || ""; });
+        // only keep the array if at least one paper has a date
+        if (dArr.some(Boolean)) dates[k] = dArr;
+        if (tArr.some(Boolean)) times[k] = tArr;
+      } else {
+        var dv = existingDates[k], tv = existingTimes[k];
+        if (dv) dates[k] = dv;
+        if (tv) times[k] = tv;
+      }
+    });
+    blob.subjects = order.slice();   // persist the new subject order
+    blob.examDates = dates; blob.examTimes = times;
+    try { localStorage.setItem(KEY, JSON.stringify(blob)); } catch(e){}
+    // regenerate the plan with the new exam weighting, then return to the tracker
+    location.href = "start.html?regen=1";
+  });
+})();
+</script>
+</body>
+</html>
