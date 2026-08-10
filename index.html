@@ -1,0 +1,1496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Zelly — HSC Study Companion</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --base:#0D0E12;
+    --lime:#78E83E;
+    --lime-deep:#4FCE2C;
+    --mint:#B4F3AE;
+    --teal:#39E6C4;
+    --teal-deep:#1FBFA6;
+    --ink:#F2F4F0;
+    --ink-soft:#9CA39A;
+    --card:#16181D;
+    --card-2:#1B1E24;
+    --edge:rgba(242,244,240,.10);
+    --edge-soft:rgba(242,244,240,.06);
+    --display:"Anton","Archivo Black","Arial Black",system-ui,sans-serif;
+    --sans:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+    --red:#FF5F6D;
+    --amber:#FFB84D;
+    --green:#3ec98a;
+  }
+
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:var(--sans);
+    color:var(--ink);
+    background:var(--base);
+    overflow-x:hidden;
+    -webkit-font-smoothing:antialiased;
+    line-height:1.55;
+  }
+  a{color:inherit}
+
+  /* ---------- flowing liquid-light field ---------- */
+  #field{
+    position:fixed; inset:0;
+    width:100vw; height:100vh;
+    z-index:0;
+    display:block;
+  }
+  /* static fallback gradient painted behind canvas (also used for reduced-motion) */
+  .field-fallback{
+    position:fixed; inset:0; z-index:0;
+    background:
+      radial-gradient(120% 90% at 15% 20%, rgba(134,224,30,.35) 0%, rgba(134,224,30,0) 55%),
+      radial-gradient(100% 80% at 85% 15%, rgba(57,230,196,.32) 0%, rgba(57,230,196,0) 55%),
+      radial-gradient(120% 100% at 75% 90%, rgba(182,240,60,.30) 0%, rgba(182,240,60,0) 55%),
+      radial-gradient(120% 100% at 20% 95%, rgba(201,247,166,.22) 0%, rgba(201,247,166,0) 55%),
+      var(--base);
+  }
+
+  /* grain / paper stain overlay */
+  .grain{
+    position:fixed; inset:0; z-index:2; pointer-events:none;
+    opacity:.22; mix-blend-mode:overlay;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E");
+  }
+
+  /* drifting SVG ribbon waves — only behind the hero */
+  .ribbons{
+    position:absolute; top:0; left:0; z-index:1; pointer-events:none;
+    width:100%; height:100vh;
+    opacity:.42;
+  }
+  .ribbons path{mix-blend-mode:screen}
+
+  /* ---------- layout ---------- */
+  .wrap{max-width:1180px;margin:0 auto;padding:0 28px}
+
+  /* ---------- sticky nav ---------- */
+  header.nav{
+    position:sticky; top:0; z-index:50;
+    display:flex; align-items:center; justify-content:space-between;
+    padding:16px 28px;
+    background:rgba(13,14,18,.55);
+    backdrop-filter:blur(16px) saturate(140%);
+    -webkit-backdrop-filter:blur(16px) saturate(140%);
+    border-bottom:1px solid transparent;
+    transition:background .3s ease, border-color .3s ease, padding .3s ease;
+  }
+  header.nav.scrolled{
+    background:rgba(13,14,18,.82);
+    border-bottom:1px solid var(--edge);
+    padding:12px 28px;
+  }
+  .nav-inner{
+    max-width:1180px; margin:0 auto; width:100%;
+    display:flex; align-items:center; justify-content:space-between; gap:24px;
+  }
+  .wm-text{display:flex;flex-direction:column;line-height:1.02;}
+  .wm-name{font-weight:800;letter-spacing:-.02em;}
+  .wm-tag{font-weight:600;font-size:.6em;letter-spacing:.04em;color:var(--ink-soft);text-transform:uppercase;margin-top:2px;white-space:nowrap;}
+  .wordmark{
+    font-family:var(--sans); font-weight:800; letter-spacing:-.02em;
+    font-size:clamp(15px,2.2vw,19px); color:var(--ink);
+    display:flex; align-items:center; gap:10px; text-decoration:none;
+  }
+  .dot{
+    width:14px;height:14px;border-radius:50%;
+    background:conic-gradient(from 0deg,var(--lime-deep),var(--teal),var(--mint),var(--lime),var(--lime-deep));
+    box-shadow:0 0 16px rgba(134,224,30,.7);
+    animation:spin 7s linear infinite; flex:0 0 auto;
+  }
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .nav-links{display:flex; align-items:center; gap:30px; margin-left:auto; margin-right:8px}
+  .nav-links a{
+    text-decoration:none; color:var(--ink-soft); font-weight:600; font-size:14.5px;
+    transition:color .2s ease; position:relative;
+  }
+  .nav-links a::after{
+    content:""; position:absolute; left:0; bottom:-5px; height:2px; width:0;
+    background:linear-gradient(90deg,var(--lime),var(--teal)); transition:width .25s ease; border-radius:2px;
+  }
+  .nav-links a:hover{color:var(--ink)}
+  .nav-links a:hover::after{width:100%}
+  .nav-right{display:flex; align-items:center; gap:16px}
+  .nav-cta{
+    font-weight:700; font-size:14px; text-decoration:none; color:#0D0E12;
+    background:linear-gradient(96deg,var(--lime),var(--lime-deep) 60%,var(--teal));
+    background-size:180% 100%;
+    padding:11px 22px; border-radius:100px;
+    display:inline-flex; align-items:center; gap:8px;
+    box-shadow:0 10px 30px -12px rgba(134,224,30,.6);
+    transition:transform .2s ease, box-shadow .2s ease, background-position .5s ease;
+  }
+  .nav-cta:hover{transform:translateY(-2px); background-position:100% 50%; box-shadow:0 16px 38px -12px rgba(57,230,196,.65)}
+  .nav-cta svg{width:15px;height:15px}
+  .nav-toggle{display:none}
+
+  /* ---------- hero ---------- */
+  .hero{
+    position:relative; z-index:4;
+    min-height:calc(94vh - 60px); display:flex; flex-direction:column; justify-content:center;
+    max-width:1180px; margin:0 auto; padding:40px 28px 70px;
+  }
+  .eyebrow{
+    display:inline-flex; align-items:center; gap:10px; width:fit-content;
+    font-weight:700; font-size:13px; letter-spacing:.14em; text-transform:uppercase;
+    color:var(--ink); background:rgba(22,24,29,.55); backdrop-filter:blur(6px);
+    border:1px solid var(--edge); padding:8px 16px; border-radius:100px; margin-bottom:26px;
+  }
+  .eyebrow b{color:var(--lime)}
+
+  .hero h1{
+    font-family:var(--display);
+    font-weight:400;
+    font-size:clamp(48.5px,12.9vw,182px);
+    line-height:.86; letter-spacing:-.01em;
+    text-transform:uppercase;
+    margin:0 0 6px;
+    background:linear-gradient(92deg,
+      var(--lime) 0%, var(--mint) 18%, var(--teal) 36%,
+      var(--teal-deep) 50%, var(--teal) 64%, var(--mint) 82%, var(--lime-deep) 100%);
+    background-size:130% 100%;
+    background-position:var(--hero-pos,0%) 50%;
+    -webkit-background-clip:text; background-clip:text;
+    -webkit-text-fill-color:transparent; color:transparent;
+    filter:drop-shadow(0 4px 34px rgba(134,224,30,.30));
+    will-change:background-position;
+    animation:heroIn 1.1s cubic-bezier(.2,.8,.2,1) both;
+  }
+  .hero h1 .l2{display:block}
+  @keyframes heroIn{
+    0%{opacity:0;transform:translateY(26px)}
+    100%{opacity:1;transform:none}
+  }
+
+  .subhead{
+    max-width:640px; font-size:clamp(17px,2.1vw,22px); line-height:1.5;
+    color:var(--ink); font-weight:500; margin:30px 0 0;
+    animation:heroIn 1.1s .12s cubic-bezier(.2,.8,.2,1) both;
+  }
+  .subhead .hl{
+    background:linear-gradient(120deg,rgba(134,224,30,.22),rgba(57,230,196,.22));
+    padding:0 4px; border-radius:4px;
+  }
+
+  .cta-row{display:flex; flex-wrap:wrap; align-items:center; gap:22px; margin-top:38px;
+    animation:heroIn 1.1s .22s cubic-bezier(.2,.8,.2,1) both;}
+  .btn-primary{
+    font-family:var(--sans); font-weight:800; font-size:17px; text-decoration:none;
+    color:#0D0E12; padding:17px 40px; border-radius:100px; position:relative;
+    display:inline-flex; align-items:center; gap:10px;
+    background:linear-gradient(96deg,var(--lime),var(--lime-deep) 55%,var(--teal));
+    background-size:180% 100%;
+    box-shadow:0 14px 40px -10px rgba(134,224,30,.55);
+    transition:transform .2s ease, box-shadow .2s ease, background-position .5s ease;
+    overflow:hidden;
+  }
+  .btn-primary:hover{transform:translateY(-3px) scale(1.02); background-position:100% 50%; box-shadow:0 22px 50px -12px rgba(57,230,196,.6)}
+  .btn-primary:active{transform:translateY(0)}
+  .btn-primary .arw{transition:transform .25s ease}
+  .btn-primary:hover .arw{transform:translateX(4px)}
+
+  .trust-row{
+    display:flex; align-items:center; gap:14px; flex-wrap:wrap;
+    font-weight:600; color:var(--ink-soft); font-size:15px;
+    animation:heroIn 1.1s .32s cubic-bezier(.2,.8,.2,1) both;
+  }
+  .trust-row b{color:var(--ink); font-family:var(--display); font-weight:400; font-size:24px; letter-spacing:.01em; margin-right:2px}
+  .trust-row .pipe{width:1px;height:22px;background:var(--edge)}
+
+  .scroll-hint{
+    margin-top:56px; display:flex; align-items:center; gap:12px;
+    font-size:12px; letter-spacing:.2em; text-transform:uppercase; color:var(--ink-soft); font-weight:600;
+  }
+  .scroll-hint .line{width:46px;height:2px;background:var(--ink-soft);position:relative;overflow:hidden;border-radius:2px}
+  .scroll-hint .line::after{content:"";position:absolute;inset:0;width:40%;background:var(--lime);animation:slide 2.2s ease-in-out infinite}
+  @keyframes slide{0%{transform:translateX(-120%)}100%{transform:translateX(320%)}}
+
+  /* ---------- generic section ---------- */
+  section.block{
+    position:relative; z-index:4;
+    background:var(--base);
+  }
+  .block.raise{
+    margin-top:6vh;
+    border-radius:44px 44px 0 0;
+    border-top:1px solid var(--edge);
+    box-shadow:0 -30px 80px -40px rgba(134,224,30,.35);
+  }
+  .section-pad{padding:110px 0}
+  .kicker{
+    font-weight:800; font-size:13px; letter-spacing:.18em; text-transform:uppercase;
+    color:var(--lime); margin-bottom:18px;
+  }
+  .h2{
+    font-family:var(--display); font-weight:400; text-transform:uppercase;
+    font-size:clamp(38px,7vw,84px); line-height:.92; letter-spacing:0; color:var(--ink);
+    max-width:16ch;
+  }
+  .h2.center{margin-left:auto;margin-right:auto;text-align:center;max-width:20ch}
+  .h2 em{
+    font-style:normal;
+    background:linear-gradient(96deg,var(--lime),var(--teal),var(--mint));
+    -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent;
+  }
+  .lead{max-width:56ch;font-size:19px;color:var(--ink-soft);margin-top:22px}
+  .lead.center{margin-left:auto;margin-right:auto;text-align:center}
+
+  /* atmospheric aura glows */
+  .aura{position:absolute; border-radius:50%; filter:blur(90px); pointer-events:none; z-index:0; opacity:.5}
+  .aura-lime{background:radial-gradient(circle,rgba(134,224,30,.55),transparent 68%)}
+  .aura-teal{background:radial-gradient(circle,rgba(57,230,196,.5),transparent 68%)}
+  .aura-mint{background:radial-gradient(circle,rgba(182,240,60,.42),transparent 68%)}
+  section.block > .wrap{position:relative; z-index:2}
+
+  /* ---------- subjects grid ---------- */
+  .subjects-head{display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:20px;margin-bottom:20px}
+  .faculty{margin-top:52px}
+  .faculty-label{
+    display:flex; align-items:center; gap:16px; margin-bottom:20px;
+    font-weight:800; font-size:13px; letter-spacing:.16em; text-transform:uppercase; color:var(--ink-soft);
+  }
+  .faculty-label .fl-dot{width:9px;height:9px;border-radius:50%;background:linear-gradient(135deg,var(--lime),var(--teal))}
+  .faculty-label .fl-line{flex:1;height:1px;background:var(--edge-soft)}
+  .subj-grid{
+    display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:14px;
+  }
+  .subj-card{
+    display:flex; align-items:center; gap:14px;
+    background:var(--card); border:1px solid var(--edge); border-radius:18px;
+    padding:18px 20px; cursor:pointer; text-decoration:none; color:inherit; position:relative; overflow:hidden;
+    transition:transform .32s cubic-bezier(.2,.8,.2,1), border-color .32s ease, box-shadow .32s ease, background .32s ease;
+  }
+  .subj-card::before{
+    content:""; position:absolute; inset:0; opacity:0;
+    background:radial-gradient(120% 140% at 0% 0%, rgba(134,224,30,.16), transparent 60%);
+    transition:opacity .32s ease;
+  }
+  .subj-card:hover{transform:translateY(-6px); border-color:rgba(182,240,60,.4); box-shadow:0 22px 44px -24px rgba(57,230,196,.6)}
+  .subj-card:hover::before{opacity:1}
+  .subj-ic{
+    width:38px;height:38px;flex:0 0 auto;border-radius:11px;
+    display:grid;place-items:center;
+    background:linear-gradient(140deg,rgba(134,224,30,.16),rgba(57,230,196,.16));
+    border:1px solid var(--edge);
+    transition:transform .32s ease;
+  }
+  .subj-card:hover .subj-ic{transform:scale(1.08) rotate(-4deg)}
+  .subj-ic svg{width:20px;height:20px;stroke:var(--mint);fill:none;stroke-width:1.8}
+  .subj-name{font-weight:700;font-size:16px;letter-spacing:-.01em;line-height:1.2}
+  .subj-card:focus-visible{outline:2px solid var(--teal);outline-offset:3px}
+
+  /* ---------- subject overview modal ---------- */
+  .subj-modal{position:fixed;inset:0;z-index:200;display:none;align-items:center;justify-content:center;padding:24px}
+  .subj-modal.open{display:flex}
+  .subj-modal-backdrop{position:absolute;inset:0;background:rgba(6,7,10,.72);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+  .subj-modal-box{position:relative;z-index:1;width:100%;max-width:560px;max-height:88vh;overflow-y:auto;
+    background:var(--card-2);border:1px solid var(--edge);border-radius:22px;padding:30px 30px 28px;
+    box-shadow:0 40px 90px -30px rgba(0,0,0,.7);animation:smPop .26s cubic-bezier(.2,.8,.2,1)}
+  @keyframes smPop{from{opacity:0;transform:translateY(14px) scale(.97)}to{opacity:1;transform:none}}
+  .subj-modal-x{position:absolute;top:16px;right:18px;width:34px;height:34px;border:none;border-radius:50%;
+    background:rgba(242,244,240,.06);color:var(--ink-soft);font-size:22px;line-height:1;cursor:pointer;transition:background .2s,color .2s}
+  .subj-modal-x:hover{background:rgba(242,244,240,.14);color:var(--ink)}
+  .sm-eyebrow{display:inline-flex;align-items:center;gap:8px;font-weight:700;font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--teal)}
+  .sm-dot{width:7px;height:7px;border-radius:50%;background:var(--teal);box-shadow:0 0 9px var(--teal)}
+  .sm-title{font-family:var(--display);font-weight:400;font-size:clamp(30px,6vw,44px);line-height:1;letter-spacing:.01em;margin:12px 0 0;padding-right:30px}
+  .sm-exam{margin:20px 0 4px;background:linear-gradient(140deg,rgba(57,230,196,.10),rgba(120,232,62,.05));border:1px solid rgba(57,230,196,.26);border-radius:14px;padding:15px 17px}
+  .sm-exam-h{font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--teal);margin-bottom:7px;font-weight:800}
+  .sm-exam p{font-size:14.5px;color:#DCE4DA;line-height:1.58}
+  .sm-exam strong{color:var(--ink);font-weight:700}
+  .sm-seclabel{margin:24px 0 12px;font-weight:800;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-soft)}
+  .sm-topics{display:flex;flex-direction:column;gap:10px}
+  .sm-topic{display:flex;gap:13px;background:var(--card);border:1px solid var(--edge);border-radius:12px;padding:13px 15px}
+  .sm-num{flex:0 0 auto;width:26px;height:26px;border-radius:8px;display:grid;place-items:center;background:linear-gradient(140deg,rgba(120,232,62,.9),rgba(57,230,196,.85));color:#0D0E12;font-weight:800;font-size:13px}
+  .sm-ttitle{font-weight:700;font-size:15px;color:var(--ink)}
+  .sm-tblurb{color:var(--ink-soft);font-size:13.5px;margin-top:3px;line-height:1.5}
+  .sm-cta{display:inline-flex;align-items:center;gap:8px;margin-top:22px;font-weight:700;font-size:14.5px;padding:13px 24px;border-radius:999px;background:linear-gradient(135deg,var(--lime),var(--teal));color:#0D0E12;text-decoration:none;transition:transform .2s,box-shadow .2s}
+  .sm-cta:hover{transform:translateY(-2px);box-shadow:0 16px 34px -18px rgba(57,230,196,.8)}
+  @media(max-width:560px){.subj-modal-box{padding:26px 20px 24px;border-radius:18px}}
+
+  /* ---------- benefits ---------- */
+  .benefits-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:58px}
+  .bcard{
+    background:linear-gradient(180deg,var(--card-2),var(--card));
+    border:1px solid var(--edge); border-radius:26px; padding:36px 30px;
+    position:relative; overflow:hidden;
+    transition:transform .35s cubic-bezier(.2,.8,.2,1), box-shadow .35s ease, border-color .35s ease;
+  }
+  .bcard:hover{transform:translateY(-8px);box-shadow:0 34px 66px -32px rgba(134,224,30,.45);border-color:rgba(182,240,60,.35)}
+  .bglow{position:absolute; width:180px;height:180px; border-radius:50%; filter:blur(50px); opacity:.3; top:-40px; right:-40px}
+  .bcard .b-ic{
+    width:56px;height:56px;border-radius:16px;display:grid;place-items:center;margin-bottom:22px;
+    background:linear-gradient(140deg,rgba(134,224,30,.18),rgba(57,230,196,.14));
+    border:1px solid var(--edge); position:relative; z-index:2;
+  }
+  .bcard .b-ic svg{width:28px;height:28px;stroke:var(--lime);fill:none;stroke-width:1.9}
+  .bcard h3{font-size:23px;font-weight:800;letter-spacing:-.01em;margin-bottom:10px;color:var(--ink);position:relative;z-index:2}
+  .bcard p{color:var(--ink-soft);font-size:16px;position:relative;z-index:2}
+  .bcard .lights{display:flex;gap:7px;margin-top:22px;position:relative;z-index:2}
+  .bcard .lights i{width:15px;height:15px;border-radius:50%;display:block}
+  .lg{background:var(--green);box-shadow:0 0 10px rgba(62,201,138,.53)}
+  .ly{background:var(--amber);box-shadow:0 0 10px rgba(255,184,77,.53)}
+  .lr{background:var(--red);box-shadow:0 0 10px rgba(255,95,109,.53)}
+
+  /* ---------- feature detail blocks ---------- */
+  .feature{
+    display:grid; grid-template-columns:1fr 1fr; gap:64px; align-items:center;
+    padding:72px 0; position:relative;
+  }
+  .feature + .feature{border-top:1px solid var(--edge-soft)}
+  .feature.reverse .f-copy{order:2}
+  .feature.reverse .f-visual{order:1}
+  .f-tag{
+    display:inline-block; font-weight:800; font-size:12px; letter-spacing:.16em; text-transform:uppercase;
+    color:var(--teal); margin-bottom:16px;
+  }
+  .f-copy h3{
+    font-family:var(--display); font-weight:400; text-transform:uppercase;
+    font-size:clamp(28px,4.4vw,50px); line-height:.98; color:var(--ink); margin-bottom:20px;
+  }
+  .f-copy p{color:var(--ink-soft); font-size:18px; max-width:46ch}
+  .f-list{list-style:none;margin-top:24px;display:flex;flex-direction:column;gap:12px}
+  .f-list li{display:flex;align-items:flex-start;gap:12px;color:var(--ink);font-weight:500;font-size:16px}
+  .f-list .tick{
+    width:22px;height:22px;flex:0 0 auto;border-radius:50%;margin-top:1px;
+    background:linear-gradient(140deg,var(--lime),var(--teal));display:grid;place-items:center;
+  }
+  .f-list .tick svg{width:12px;height:12px;stroke:#0D0E12;stroke-width:3;fill:none}
+
+  .f-visual{position:relative}
+  .mock{
+    background:linear-gradient(180deg,rgba(27,30,36,.9),rgba(19,21,26,.95));
+    border:1px solid var(--edge); border-radius:24px; padding:24px;
+    box-shadow:0 40px 80px -40px rgba(0,0,0,.8);
+    position:relative; z-index:2; backdrop-filter:blur(4px);
+  }
+  .mock-glow{position:absolute; inset:-30px; border-radius:40px; z-index:0; filter:blur(60px); opacity:.35}
+  .mock-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+  .mock-title{font-weight:800;font-size:15px;letter-spacing:-.01em}
+  .mock-sub{font-size:12px;color:var(--ink-soft);font-weight:600}
+  .mock-dots{display:flex;gap:6px}
+  .mock-dots span{width:9px;height:9px;border-radius:50%;background:var(--edge)}
+
+  /* confidence map rows */
+  .dp-row{
+    display:flex;align-items:center;gap:14px;padding:12px 14px;border-radius:12px;
+    background:rgba(255,255,255,.02);border:1px solid var(--edge-soft);margin-bottom:8px;
+  }
+  .dp-row:last-child{margin-bottom:0}
+  .dp-txt{flex:1;font-size:14px;font-weight:500;color:var(--ink)}
+  .dp-txt small{display:block;color:var(--ink-soft);font-weight:500;font-size:12px;margin-top:2px}
+  .dp-light{width:16px;height:16px;border-radius:50%;flex:0 0 auto}
+  .dp-lg{background:var(--green);box-shadow:0 0 12px rgba(62,201,138,.6)}
+  .dp-ly{background:var(--amber);box-shadow:0 0 12px rgba(255,184,77,.6)}
+  .dp-lr{background:var(--red);box-shadow:0 0 12px rgba(255,95,109,.6)}
+  .dp-lights{display:flex;gap:6px}
+  .dp-lights i{width:11px;height:11px;border-radius:50%;opacity:.28}
+  .dp-lights i.on{opacity:1}
+
+  /* priority stars list */
+  .star-row{display:flex;align-items:center;gap:14px;padding:13px 14px;border-radius:12px;margin-bottom:8px;
+    background:rgba(255,255,255,.02);border:1px solid var(--edge-soft)}
+  .star-row:last-child{margin-bottom:0}
+  .star-ic{width:20px;height:20px;flex:0 0 auto}
+  .star-ic svg{width:20px;height:20px}
+  .star-row .s-name{flex:1;font-size:14px;font-weight:600}
+  .star-row .s-badge{font-size:11px;font-weight:700;padding:4px 9px;border-radius:100px;letter-spacing:.03em}
+  .badge-hi{background:rgba(255,95,109,.14);color:#FF8A93;border:1px solid rgba(255,95,109,.3)}
+  .badge-mid{background:rgba(255,184,77,.14);color:#FFCB80;border:1px solid rgba(255,184,77,.3)}
+
+  /* weekly timetable */
+  .tt-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:7px}
+  .tt-col{display:flex;flex-direction:column;gap:7px}
+  .tt-day{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-soft);text-align:center;margin-bottom:2px}
+  .tt-slot{border-radius:9px;padding:9px 8px;font-size:11px;font-weight:700;line-height:1.15;min-height:46px;display:flex;flex-direction:column;justify-content:center}
+  .tt-slot small{display:block;font-weight:600;opacity:.7;font-size:9.5px;margin-top:2px}
+  .tt-a{background:linear-gradient(140deg,rgba(134,224,30,.22),rgba(134,224,30,.08));border:1px solid rgba(134,224,30,.32);color:var(--mint)}
+  .tt-b{background:linear-gradient(140deg,rgba(57,230,196,.22),rgba(57,230,196,.08));border:1px solid rgba(57,230,196,.32);color:#8FF0DE}
+  .tt-c{background:linear-gradient(140deg,rgba(255,184,77,.18),rgba(255,184,77,.06));border:1px solid rgba(255,184,77,.28);color:#FFCB80}
+  .tt-empty{background:rgba(255,255,255,.02);border:1px dashed var(--edge);color:var(--ink-soft);opacity:.5}
+
+  /* study recipe card */
+  .recipe-step{display:flex;gap:14px;padding:12px 0;border-bottom:1px solid var(--edge-soft)}
+  .recipe-step:last-child{border-bottom:none}
+  .recipe-num{
+    width:28px;height:28px;flex:0 0 auto;border-radius:50%;
+    background:linear-gradient(140deg,var(--lime),var(--teal));color:#0D0E12;
+    font-weight:800;font-size:13px;display:grid;place-items:center;
+  }
+  .recipe-txt{font-size:14px}
+  .recipe-txt b{display:block;font-weight:700;color:var(--ink);margin-bottom:2px}
+  .recipe-txt span{color:var(--ink-soft);font-size:13px}
+
+  /* ---------- method / why it works ---------- */
+  .method{
+    position:relative; z-index:4; overflow:hidden;
+    background:linear-gradient(160deg,#0A0B0E,#111418 60%,#0C1512);
+    border-top:1px solid var(--edge);
+  }
+  .method-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:60px;align-items:center}
+  .method .h2{max-width:15ch}
+  .method-points{margin-top:30px;display:flex;flex-direction:column;gap:22px}
+  .mp{display:flex;gap:16px}
+  .mp-ic{width:42px;height:42px;flex:0 0 auto;border-radius:12px;display:grid;place-items:center;
+    background:linear-gradient(140deg,rgba(134,224,30,.16),rgba(57,230,196,.14));border:1px solid var(--edge)}
+  .mp-ic svg{width:22px;height:22px;stroke:var(--lime);fill:none;stroke-width:1.9}
+  .mp h4{font-size:18px;font-weight:800;margin-bottom:4px}
+  .mp p{color:var(--ink-soft);font-size:15.5px;max-width:44ch}
+  .method-note{margin-top:30px;font-size:14px;color:var(--ink-soft);font-style:italic;max-width:50ch;opacity:.85}
+
+  /* reds turning green visual */
+  .transform-viz{
+    background:linear-gradient(180deg,rgba(27,30,36,.9),rgba(19,21,26,.95));
+    border:1px solid var(--edge); border-radius:24px; padding:30px;
+    box-shadow:0 40px 80px -40px rgba(0,0,0,.8); position:relative; z-index:2;
+  }
+  .tv-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:22px;font-size:12px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft)}
+  .tv-head .wk{color:var(--lime)}
+  .tv-track{display:flex;flex-direction:column;gap:14px}
+  .tv-line{display:flex;align-items:center;gap:10px}
+  .tv-label{width:74px;font-size:12px;font-weight:600;color:var(--ink-soft);flex:0 0 auto}
+  .tv-cells{display:flex;gap:7px;flex:1}
+  .tv-cell{flex:1;height:26px;border-radius:7px;transition:background .5s ease}
+  .arrow-mid{text-align:center;color:var(--ink-soft);margin:4px 0;font-size:20px;opacity:.5}
+
+  /* ---------- testimonials ---------- */
+  .tst-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:22px;margin-top:56px}
+  .tst{
+    background:linear-gradient(180deg,var(--card-2),var(--card));
+    border:1px solid var(--edge); border-radius:22px; padding:30px 30px 26px;
+    position:relative; transition:transform .32s cubic-bezier(.2,.8,.2,1), border-color .32s ease, box-shadow .32s ease;
+  }
+  .tst:hover{transform:translateY(-6px);border-color:rgba(182,240,60,.32);box-shadow:0 30px 60px -34px rgba(57,230,196,.5)}
+  .tst .quote-mark{font-family:var(--display);font-size:60px;line-height:.6;color:rgba(134,224,30,.28);margin-bottom:6px;display:block}
+  .tst p{font-size:17px;color:var(--ink);line-height:1.55;font-weight:500}
+  .tst .who{margin-top:20px;display:flex;align-items:center;gap:12px}
+  .tst .av{width:38px;height:38px;border-radius:50%;flex:0 0 auto;
+    background:linear-gradient(140deg,var(--lime),var(--teal));display:grid;place-items:center;
+    font-weight:800;color:#0D0E12;font-size:15px}
+  .tst .who b{font-weight:700;font-size:14px;display:block}
+  .tst .who span{color:var(--ink-soft);font-size:13px}
+  .tst .stars{display:flex;gap:3px;margin-bottom:14px}
+  .tst .stars svg{width:15px;height:15px;fill:var(--amber)}
+
+  /* ---------- availability ---------- */
+  .avail{position:relative; z-index:4; overflow:hidden; background:var(--base); border-top:1px solid var(--edge)}
+  .avail-inner{
+    max-width:1000px;margin:0 auto;
+    background:linear-gradient(140deg,rgba(27,30,36,.7),rgba(15,17,21,.8));
+    border:1px solid var(--edge); border-radius:32px; padding:56px 48px;
+    display:grid;grid-template-columns:1.1fr .9fr;gap:48px;align-items:center;position:relative;overflow:hidden;
+  }
+  .avail-inner .h2{font-size:clamp(32px,5vw,58px);max-width:14ch}
+  .avail p{color:var(--ink-soft);font-size:18px;margin-top:18px;max-width:40ch}
+  .avail-feats{display:flex;flex-direction:column;gap:16px}
+  .af{display:flex;align-items:center;gap:14px;padding:16px 20px;border-radius:16px;
+    background:rgba(255,255,255,.02);border:1px solid var(--edge)}
+  .af-ic{width:40px;height:40px;flex:0 0 auto;border-radius:11px;display:grid;place-items:center;
+    background:linear-gradient(140deg,rgba(134,224,30,.16),rgba(57,230,196,.14));border:1px solid var(--edge)}
+  .af-ic svg{width:20px;height:20px;stroke:var(--mint);fill:none;stroke-width:1.8}
+  .af b{font-weight:700;font-size:15px;display:block}
+  .af span{color:var(--ink-soft);font-size:13px}
+
+  /* ---------- FAQ ---------- */
+  .faq-wrap{max-width:820px;margin:52px auto 0}
+  .faq-item{border-bottom:1px solid var(--edge)}
+  .faq-item:first-child{border-top:1px solid var(--edge)}
+  .faq-q{
+    width:100%; text-align:left; background:none; border:none; cursor:pointer;
+    display:flex;align-items:center;justify-content:space-between;gap:20px;
+    padding:26px 4px; color:var(--ink); font-family:var(--sans);
+    font-size:clamp(17px,2.4vw,21px); font-weight:700; letter-spacing:-.01em;
+    transition:color .2s ease;
+  }
+  .faq-q:hover{color:var(--lime)}
+  .faq-toggle{
+    width:30px;height:30px;flex:0 0 auto;border-radius:50%;position:relative;
+    border:1.5px solid var(--edge);transition:border-color .3s ease, background .3s ease;
+  }
+  .faq-toggle::before,.faq-toggle::after{
+    content:"";position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+    background:var(--lime);border-radius:2px;transition:transform .3s ease, background .3s ease;
+  }
+  .faq-toggle::before{width:12px;height:2px}
+  .faq-toggle::after{width:2px;height:12px}
+  .faq-item.open .faq-toggle{background:rgba(134,224,30,.12);border-color:rgba(134,224,30,.4)}
+  .faq-item.open .faq-toggle::after{transform:translate(-50%,-50%) scaleY(0)}
+  .faq-a{
+    overflow:hidden;max-height:0;transition:max-height .4s cubic-bezier(.2,.8,.2,1);
+  }
+  .faq-a-inner{padding:0 4px 26px;color:var(--ink-soft);font-size:16.5px;line-height:1.6;max-width:66ch}
+
+  /* ---------- final cta ---------- */
+  .final{position:relative;z-index:4;background:var(--base);text-align:center;padding:130px 28px 100px;overflow:hidden;border-top:1px solid var(--edge)}
+  .final h2{
+    font-family:var(--display);font-weight:400;text-transform:uppercase;
+    font-size:clamp(44px,10vw,150px);line-height:.9;
+    background:linear-gradient(92deg,var(--lime),var(--mint) 25%,var(--teal) 60%,var(--lime-deep));
+    background-size:200% 100%;
+    -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent;
+    animation:flow 9s ease-in-out infinite;
+    margin-bottom:30px; position:relative; z-index:2;
+    filter:drop-shadow(0 4px 40px rgba(134,224,30,.28));
+  }
+  @keyframes flow{
+    0%,100%{background-position:0% 50%}
+    50%{background-position:100% 50%}
+  }
+  .final p{max-width:48ch;margin:0 auto 36px;color:var(--ink-soft);font-size:19px;position:relative;z-index:2}
+  .final .btn-primary{position:relative;z-index:2}
+  .final .sub-note{margin-top:22px;font-size:14px;color:var(--ink-soft);font-weight:600}
+
+  /* ---------- footer ---------- */
+  footer.site{
+    position:relative;z-index:4;background:linear-gradient(180deg,var(--base),#090A0D);
+    border-top:1px solid var(--edge); padding:72px 28px 40px;
+  }
+  .foot-grid{
+    max-width:1180px;margin:0 auto;display:grid;
+    grid-template-columns:1.6fr 1fr 1fr 1fr;gap:40px;
+  }
+  .foot-brand .fm{display:flex;align-items:center;gap:10px;font-weight:800;color:var(--ink);font-size:19px;margin-bottom:16px}
+  .foot-brand p{color:var(--ink-soft);font-size:15px;max-width:34ch}
+  .foot-socials{display:flex;gap:12px;margin-top:22px}
+  .foot-socials a{
+    width:38px;height:38px;border-radius:11px;display:grid;place-items:center;
+    border:1px solid var(--edge);color:var(--ink-soft);text-decoration:none;
+    transition:transform .2s ease, color .2s ease, border-color .2s ease, background .2s ease;
+  }
+  .foot-socials a:hover{transform:translateY(-3px);color:#0D0E12;background:var(--lime);border-color:var(--lime)}
+  .foot-socials svg{width:18px;height:18px}
+  .foot-col h5{font-weight:800;font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink);margin-bottom:18px}
+  .foot-col a{display:block;color:var(--ink-soft);text-decoration:none;font-size:15px;margin-bottom:12px;transition:color .2s ease, padding-left .2s ease}
+  .foot-col a:hover{color:var(--lime);padding-left:4px}
+  .foot-bottom{
+    max-width:1180px;margin:56px auto 0;padding-top:26px;border-top:1px solid var(--edge);
+    display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px;
+    color:var(--ink-soft);font-size:13.5px;
+  }
+  .foot-bottom .made{display:flex;align-items:center;gap:8px}
+
+  /* ---------- reveal on scroll ---------- */
+  .reveal{opacity:0;transform:translateY(34px);transition:opacity .8s ease,transform .8s cubic-bezier(.2,.8,.2,1)}
+  .reveal.in{opacity:1;transform:none}
+  .reveal.d1{transition-delay:.08s}
+  .reveal.d2{transition-delay:.16s}
+  .reveal.d3{transition-delay:.24s}
+  .reveal.d4{transition-delay:.32s}
+
+  /* ---------- responsive ---------- */
+  @media (max-width:960px){
+    .benefits-grid{grid-template-columns:1fr}
+    .feature{grid-template-columns:1fr;gap:36px;padding:56px 0}
+    .feature.reverse .f-copy{order:1}
+    .feature.reverse .f-visual{order:2}
+    .method-grid{grid-template-columns:1fr;gap:44px}
+    .avail-inner{grid-template-columns:1fr;gap:36px;padding:44px 32px}
+    .tst-grid{grid-template-columns:1fr}
+    .foot-grid{grid-template-columns:1fr 1fr;gap:32px}
+    .foot-brand{grid-column:1/-1}
+  }
+  @media (max-width:760px){
+    .nav-links{display:none}
+    header.nav{padding:14px 20px}
+    header.nav.scrolled{padding:12px 20px}
+    .hero{min-height:auto;padding:40px 22px 50px}
+    .cta-row{gap:16px}
+    .section-pad{padding:76px 0}
+    .block.raise{border-radius:32px 32px 0 0}
+    .subj-grid{grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}
+    .tt-grid{grid-template-columns:repeat(5,1fr);gap:4px}
+    .tt-slot{padding:6px 4px;font-size:9.5px;min-height:40px}
+    .foot-grid{grid-template-columns:1fr}
+    .foot-bottom{flex-direction:column;align-items:flex-start}
+  }
+  @media (max-width:420px){
+    .subj-grid{grid-template-columns:1fr}
+  }
+
+  @media (prefers-reduced-motion:reduce){
+    *{animation:none !important; transition:none !important}
+    .reveal{opacity:1;transform:none}
+    #field{display:none}
+    .hero h1{background-position:30% 50% !important;animation:none !important}
+    .final h2{background-position:40% 50%}
+    html{scroll-behavior:auto}
+    /* SMIL <animate> isn't stopped by animation:none — hide the morphing ribbons entirely */
+    .ribbons{display:none !important}
+  }
+</style>
+</head>
+<body>
+
+  <div class="field-fallback"></div>
+  <canvas id="field"></canvas>
+
+  <!-- drifting ribbon waves behind hero -->
+  <svg class="ribbons" viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+    <defs>
+      <linearGradient id="r1" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#86E01E"/><stop offset="1" stop-color="#39E6C4"/>
+      </linearGradient>
+      <linearGradient id="r2" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0" stop-color="#C9F7A6"/><stop offset="1" stop-color="#B6F03C"/>
+      </linearGradient>
+      <linearGradient id="r3" x1="0" y1="1" x2="1" y2="0">
+        <stop offset="0" stop-color="#B6F03C"/><stop offset="1" stop-color="#1FBFA6"/>
+      </linearGradient>
+    </defs>
+    <path fill="url(#r1)" opacity=".5" d="M-100,240 C300,120 520,360 820,260 C1120,160 1360,300 1560,220 L1560,-60 L-100,-60 Z">
+      <animate attributeName="d" dur="18s" repeatCount="indefinite"
+        values="M-100,240 C300,120 520,360 820,260 C1120,160 1360,300 1560,220 L1560,-60 L-100,-60 Z;
+                M-100,200 C300,320 520,120 820,300 C1120,420 1360,180 1560,300 L1560,-60 L-100,-60 Z;
+                M-100,240 C300,120 520,360 820,260 C1120,160 1360,300 1560,220 L1560,-60 L-100,-60 Z"/>
+    </path>
+    <path fill="url(#r3)" opacity=".4" d="M-100,640 C260,760 560,520 860,660 C1160,800 1340,560 1560,660 L1560,960 L-100,960 Z">
+      <animate attributeName="d" dur="22s" repeatCount="indefinite"
+        values="M-100,640 C260,760 560,520 860,660 C1160,800 1340,560 1560,660 L1560,960 L-100,960 Z;
+                M-100,700 C260,560 560,780 860,600 C1160,460 1340,720 1560,600 L1560,960 L-100,960 Z;
+                M-100,640 C260,760 560,520 860,660 C1160,800 1340,560 1560,660 L1560,960 L-100,960 Z"/>
+    </path>
+    <path fill="url(#r2)" opacity=".3" d="M-100,460 C320,400 540,560 900,470 C1200,400 1380,520 1560,460 L1560,540 C1380,600 1200,470 900,560 C540,660 320,500 -100,560 Z">
+      <animate attributeName="d" dur="26s" repeatCount="indefinite"
+        values="M-100,460 C320,400 540,560 900,470 C1200,400 1380,520 1560,460 L1560,540 C1380,600 1200,470 900,560 C540,660 320,500 -100,560 Z;
+                M-100,520 C320,580 540,420 900,540 C1200,620 1380,440 1560,520 L1560,600 C1380,520 1200,640 900,500 C540,400 320,600 -100,600 Z;
+                M-100,460 C320,400 540,560 900,470 C1200,400 1380,520 1560,460 L1560,540 C1380,600 1200,470 900,560 C540,660 320,500 -100,560 Z"/>
+    </path>
+  </svg>
+
+  <div class="grain"></div>
+
+  <!-- ============ NAV ============ -->
+  <header class="nav" id="nav">
+    <div class="nav-inner">
+      <a class="wordmark" href="#top"><span class="dot"></span><span class="wm-text"><span class="wm-name">Zelly</span><span class="wm-tag">HSC Study Companion</span></span></a>
+      <nav class="nav-links">
+        <a href="#how">How it works</a>
+        <a href="#subjects">Subjects</a>
+        <a href="#faq">FAQ</a>
+      </nav>
+      <div class="nav-right">
+        <a class="nav-cta" href="signup.html">Start studying
+          <svg viewBox="0 0 24 24" fill="none" stroke="#0D0E12" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- ============ HERO ============ -->
+  <main class="hero" id="top">
+    <span class="eyebrow"><b>NEW</b> · The viral traffic-light method — done for you</span>
+    <h1>Study<span class="l2">What</span><span class="l2">Matters.</span></h1>
+    <p class="subhead">
+      See exactly where you stand on <span class="hl">every syllabus dot point</span>, flag your priorities,
+      and get a study plan built around your weak spots.
+    </p>
+    <div class="cta-row">
+      <a class="btn-primary" href="signup.html">Start studying
+        <span class="arw">→</span>
+      </a>
+    </div>
+    <div class="trust-row" style="margin-top:34px">
+      <span><b>23</b> subjects</span><span class="pipe"></span>
+      <span><b>1,281</b> dot points</span><span class="pipe"></span>
+      <span>built by an HSC student</span>
+    </div>
+    <div class="scroll-hint"><span class="line"></span> Scroll to explore</div>
+  </main>
+
+  <!-- ============ VIRAL METHOD BAND ============ -->
+  <section class="block" id="viral-method">
+    <span class="aura aura-lime" style="width:460px;height:460px;top:-80px;right:-160px;opacity:.4"></span>
+    <div class="wrap section-pad center">
+      <p class="kicker reveal center" style="text-align:center">You've seen it all over TikTok</p>
+      <h2 class="h2 center reveal">The viral traffic-light method — <em>without the spreadsheet.</em></h2>
+      <p class="lead reveal" style="margin-left:auto;margin-right:auto;text-align:center">The TikTok traffic-light method is brilliant… but setting it up is a pain. Instead of spending hours building spreadsheets, we've already built it for you. <span class="hl">Every HSC dot point across 23 subjects</span>, ready in one tap.</p>
+    </div>
+  </section>
+
+  <!-- ============ BENEFITS (in minutes) ============ -->
+  <section class="block raise" id="how">
+    <span class="aura aura-lime" style="width:520px;height:520px;top:-120px;left:-140px"></span>
+    <span class="aura aura-teal" style="width:440px;height:440px;top:220px;right:-160px"></span>
+    <div class="wrap section-pad">
+      <p class="kicker reveal">In minutes, not weeks</p>
+      <h2 class="h2 reveal">Know exactly where you stand — <em>in minutes.</em></h2>
+      <p class="lead reveal">No more staring at a blank syllabus. Rate what you know, mark what counts, and let the plan sort the rest.</p>
+      <div class="benefits-grid">
+        <article class="bcard reveal d1">
+          <span class="bglow" style="background:var(--lime)"></span>
+          <div class="b-ic">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="6" r="2.4"/><circle cx="12" cy="12" r="2.4"/><circle cx="12" cy="18" r="2.4"/><path d="M6 6h1M6 12h1M6 18h1"/></svg>
+          </div>
+          <h3>Traffic-light your confidence</h3>
+          <p>Go through the syllabus and tag each dot point red, amber or green. In one sitting you can see your whole course at a glance.</p>
+          <div class="lights"><i class="lr"></i><i class="ly"></i><i class="lg"></i></div>
+        </article>
+        <article class="bcard reveal d2">
+          <span class="bglow" style="background:var(--amber)"></span>
+          <div class="b-ic">
+            <svg viewBox="0 0 24 24"><path d="M12 3l2.6 5.3 5.9.9-4.2 4.1 1 5.8L12 16.9 6.7 19.9l1-5.8L3.5 9.2l5.9-.9z"/></svg>
+          </div>
+          <h3>Flag your priorities</h3>
+          <p>Star the topics that carry the most marks or scare you the most. Your priorities rise straight to the top of the pile.</p>
+          <div class="lights"><i class="lr"></i><i class="lr"></i><i class="ly"></i></div>
+        </article>
+        <article class="bcard reveal d3">
+          <span class="bglow" style="background:var(--teal)"></span>
+          <div class="b-ic">
+            <svg viewBox="0 0 24 24"><path d="M9 11l2.5 2.5L16 8"/><rect x="4" y="4" width="16" height="16" rx="3"/></svg>
+          </div>
+          <h3>Get your plan</h3>
+          <p>A study plan builds itself around your weak spots and deadlines, so every session hits the stuff that actually moves your marks.</p>
+          <div class="lights"><i class="lg"></i><i class="lg"></i><i class="ly"></i></div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SUBJECTS GRID ============ -->
+  <section class="block" id="subjects">
+    <span class="aura aura-mint" style="width:480px;height:480px;top:80px;right:-180px"></span>
+    <div class="wrap section-pad">
+      <div class="subjects-head">
+        <div>
+          <p class="kicker reveal">The library</p>
+          <h2 class="h2 reveal">Twenty-three subjects, <em>every</em> dot point.</h2>
+        </div>
+        <p class="lead reveal" style="max-width:34ch;margin:0 0 6px">Mapped straight to the current NSW syllabus. Pick yours and start colouring.</p>
+      </div>
+
+      <div class="faculty reveal">
+        <div class="faculty-label"><span class="fl-dot"></span> Sciences <span class="fl-line"></span></div>
+        <div class="subj-grid" data-group="sciences"></div>
+      </div>
+      <div class="faculty reveal">
+        <div class="faculty-label"><span class="fl-dot"></span> Maths <span class="fl-line"></span></div>
+        <div class="subj-grid" data-group="maths"></div>
+      </div>
+      <div class="faculty reveal">
+        <div class="faculty-label"><span class="fl-dot"></span> English <span class="fl-line"></span></div>
+        <div class="subj-grid" data-group="english"></div>
+      </div>
+      <div class="faculty reveal">
+        <div class="faculty-label"><span class="fl-dot"></span> Humanities &amp; Creative <span class="fl-line"></span></div>
+        <div class="subj-grid" data-group="humanities"></div>
+      </div>
+      <div class="faculty reveal">
+        <div class="faculty-label"><span class="fl-dot"></span> Languages <span class="fl-line"></span></div>
+        <div class="subj-grid" data-group="languages"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ FEATURE DETAIL BLOCKS ============ -->
+  <section class="block">
+    <span class="aura aura-lime" style="width:460px;height:460px;top:60px;left:-200px"></span>
+    <span class="aura aura-teal" style="width:460px;height:460px;bottom:60px;right:-200px"></span>
+    <div class="wrap section-pad" style="padding-top:40px;padding-bottom:40px">
+
+      <!-- (a) confidence map -->
+      <div class="feature reveal">
+        <div class="f-copy">
+          <span class="f-tag">The confidence map</span>
+          <h3>Your whole course, in five colours.</h3>
+          <p>Every dot point gets one of five honest colours — from <em>dark green, nailed it</em> all the way to <em>red, I'm cooked</em>. In one sitting, your whole course becomes a map of exactly where you stand.</p>
+          <ul class="f-list">
+            <li><span class="tick"><svg viewBox="0 0 24 24"><path d="M5 12l5 5L20 6"/></svg></span> Five colours, from mastered to "cooked"</li>
+            <li><span class="tick"><svg viewBox="0 0 24 24"><path d="M5 12l5 5L20 6"/></svg></span> See progress per topic and per subject</li>
+            <li><span class="tick"><svg viewBox="0 0 24 24"><path d="M5 12l5 5L20 6"/></svg></span> Spot the red patches you've been avoiding</li>
+          </ul>
+        </div>
+        <div class="f-visual">
+          <span class="mock-glow" style="background:radial-gradient(circle,rgba(134,224,30,.5),transparent 70%)"></span>
+          <div class="mock">
+            <div class="mock-head">
+              <div><div class="mock-title">Your confidence key</div><div class="mock-sub">Five colours, one honest picture</div></div>
+            </div>
+            <div class="dp-row">
+              <span class="dp-light" style="background:#1e7d3c;box-shadow:0 0 12px rgba(30,125,60,.75)"></span>
+              <div class="dp-txt">Dark green<small>Strong — locked in</small></div>
+            </div>
+            <div class="dp-row">
+              <span class="dp-light" style="background:#6cc24a;box-shadow:0 0 12px rgba(108,194,74,.65)"></span>
+              <div class="dp-txt">Light green<small>Good — just needs a tiny look-over</small></div>
+            </div>
+            <div class="dp-row">
+              <span class="dp-light" style="background:#f4d03f;box-shadow:0 0 12px rgba(244,208,63,.55)"></span>
+              <div class="dp-txt">Yellow<small>OK — needs more revision</small></div>
+            </div>
+            <div class="dp-row">
+              <span class="dp-light" style="background:#e88b1a;box-shadow:0 0 12px rgba(232,139,26,.6)"></span>
+              <div class="dp-txt">Orange<small>Shaky</small></div>
+            </div>
+            <div class="dp-row">
+              <span class="dp-light" style="background:#e4572e;box-shadow:0 0 12px rgba(228,87,46,.6)"></span>
+              <div class="dp-txt">Red<small>I'm cooked, bro 😅</small></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- (b) priority stars -->
+      <div class="feature reverse reveal">
+        <div class="f-copy">
+          <span class="f-tag">Priority stars</span>
+          <h3>Not all dot points are equal.</h3>
+          <p>Some topics carry more marks, come up every year, or just terrify you. Star them and they jump to the front of your plan — so your limited hours go where they matter most.</p>
+          <ul class="f-list">
+            <li><span class="tick"><svg viewBox="0 0 24 24"><path d="M5 12l5 5L20 6"/></svg></span> Mark high-value and high-stress topics</li>
+            <li><span class="tick"><svg viewBox="0 0 24 24"><path d="M5 12l5 5L20 6"/></svg></span> Starred + red = your true weak spots</li>
+            <li><span class="tick"><svg viewBox="0 0 24 24"><path d="M5 12l5 5L20 6"/></svg></span> The plan weights them automatically</li>
+          </ul>
+        </div>
+        <div class="f-visual">
+          <span class="mock-glow" style="background:radial-gradient(circle,rgba(255,184,77,.4),transparent 70%)"></span>
+          <div class="mock">
+            <div class="mock-head">
+              <div><div class="mock-title">My priorities</div><div class="mock-sub">Across 4 subjects</div></div>
+              <div class="mock-dots"><span></span><span></span><span></span></div>
+            </div>
+            <div class="star-row">
+              <span class="star-ic"><svg viewBox="0 0 24 24" fill="#FFB84D"><path d="M12 3l2.6 5.3 5.9.9-4.2 4.1 1 5.8L12 16.9 6.7 19.9l1-5.8L3.5 9.2l5.9-.9z"/></svg></span>
+              <span class="s-name">Chemistry · Equilibrium &amp; acids</span>
+              <span class="s-badge badge-hi">High marks</span>
+            </div>
+            <div class="star-row">
+              <span class="star-ic"><svg viewBox="0 0 24 24" fill="#FFB84D"><path d="M12 3l2.6 5.3 5.9.9-4.2 4.1 1 5.8L12 16.9 6.7 19.9l1-5.8L3.5 9.2l5.9-.9z"/></svg></span>
+              <span class="s-name">English Adv · Common Module</span>
+              <span class="s-badge badge-hi">Every year</span>
+            </div>
+            <div class="star-row">
+              <span class="star-ic"><svg viewBox="0 0 24 24" fill="#FFB84D"><path d="M12 3l2.6 5.3 5.9.9-4.2 4.1 1 5.8L12 16.9 6.7 19.9l1-5.8L3.5 9.2l5.9-.9z"/></svg></span>
+              <span class="s-name">Maths Adv · Calculus</span>
+              <span class="s-badge badge-mid">Shaky</span>
+            </div>
+            <div class="star-row">
+              <span class="star-ic"><svg viewBox="0 0 24 24" fill="#FFB84D"><path d="M12 3l2.6 5.3 5.9.9-4.2 4.1 1 5.8L12 16.9 6.7 19.9l1-5.8L3.5 9.2l5.9-.9z"/></svg></span>
+              <span class="s-name">Physics · Electromagnetism</span>
+              <span class="s-badge badge-mid">Scary</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- (c) personalised plan -->
+      <div class="feature reveal">
+        <div class="f-copy">
+          <span class="f-tag">Your personalised plan</span>
+          <h3>A week that studies your weak spots.</h3>
+          <p>Tell it your exam dates and how much time you've got. It lays out a realistic weekly timetable that front-loads your reds and revisits them before you forget.</p>
+          <ul class="f-list">
+            <li><span class="tick"><svg viewBox="0 0 24 24"><path d="M5 12l5 5L20 6"/></svg></span> Built around your deadlines</li>
+            <li><span class="tick"><svg viewBox="0 0 24 24"><path d="M5 12l5 5L20 6"/></svg></span> Weak spots scheduled first, revisited often</li>
+            <li><span class="tick"><svg viewBox="0 0 24 24"><path d="M5 12l5 5L20 6"/></svg></span> Adjusts as your colours change</li>
+          </ul>
+        </div>
+        <div class="f-visual">
+          <span class="mock-glow" style="background:radial-gradient(circle,rgba(57,230,196,.45),transparent 70%)"></span>
+          <div class="mock">
+            <div class="mock-head">
+              <div><div class="mock-title">This week</div><div class="mock-sub">6 focused sessions</div></div>
+              <div class="mock-dots"><span></span><span></span><span></span></div>
+            </div>
+            <div class="tt-grid">
+              <div class="tt-col">
+                <div class="tt-day">Mon</div>
+                <div class="tt-slot tt-a">Chem<small>Equilibrium</small></div>
+                <div class="tt-slot tt-empty">—</div>
+              </div>
+              <div class="tt-col">
+                <div class="tt-day">Tue</div>
+                <div class="tt-slot tt-b">Maths<small>Calculus</small></div>
+                <div class="tt-slot tt-c">Bio<small>Recall</small></div>
+              </div>
+              <div class="tt-col">
+                <div class="tt-day">Wed</div>
+                <div class="tt-slot tt-empty">—</div>
+                <div class="tt-slot tt-a">Physics<small>EM fields</small></div>
+              </div>
+              <div class="tt-col">
+                <div class="tt-day">Thu</div>
+                <div class="tt-slot tt-b">English<small>Module</small></div>
+                <div class="tt-slot tt-empty">—</div>
+              </div>
+              <div class="tt-col">
+                <div class="tt-day">Fri</div>
+                <div class="tt-slot tt-c">Chem<small>Recall</small></div>
+                <div class="tt-slot tt-a">Maths<small>Calculus</small></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- (d) study recipes -->
+      <div class="feature reverse reveal">
+        <div class="f-copy">
+          <span class="f-tag">Study recipes</span>
+          <h3>How to actually study — not just what.</h3>
+          <p>Knowing a topic is red is half the battle. Each session comes with a simple, proven recipe so you're doing real retrieval practice instead of highlighting the same page for the fifth time.</p>
+          <ul class="f-list">
+            <li><span class="tick"><svg viewBox="0 0 24 24"><path d="M5 12l5 5L20 6"/></svg></span> Short, structured, active-recall steps</li>
+            <li><span class="tick"><svg viewBox="0 0 24 24"><path d="M5 12l5 5L20 6"/></svg></span> Built around how memory actually works</li>
+            <li><span class="tick"><svg viewBox="0 0 24 24"><path d="M5 12l5 5L20 6"/></svg></span> Finish by re-rating your confidence</li>
+          </ul>
+        </div>
+        <div class="f-visual">
+          <span class="mock-glow" style="background:radial-gradient(circle,rgba(182,240,60,.42),transparent 70%)"></span>
+          <div class="mock">
+            <div class="mock-head">
+              <div><div class="mock-title">Recipe · Retrieval sprint</div><div class="mock-sub">20 min · Chemistry</div></div>
+              <div class="mock-dots"><span></span><span></span><span></span></div>
+            </div>
+            <div class="recipe-step">
+              <div class="recipe-num">1</div>
+              <div class="recipe-txt"><b>Brain-dump</b><span>Write everything you remember about equilibrium — no notes.</span></div>
+            </div>
+            <div class="recipe-step">
+              <div class="recipe-num">2</div>
+              <div class="recipe-txt"><b>Check &amp; fix the gaps</b><span>Open your notes only now. Highlight what you missed.</span></div>
+            </div>
+            <div class="recipe-step">
+              <div class="recipe-num">3</div>
+              <div class="recipe-txt"><b>One past-paper question</b><span>Apply it under time. Mark honestly.</span></div>
+            </div>
+            <div class="recipe-step">
+              <div class="recipe-num">4</div>
+              <div class="recipe-txt"><b>Re-rate your colour</b><span>Still red? It comes back sooner in your plan.</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ============ METHOD / WHY IT WORKS ============ -->
+  <section class="method">
+    <span class="aura aura-lime" style="width:520px;height:520px;top:-100px;right:-140px;opacity:.35"></span>
+    <div class="wrap section-pad">
+      <div class="method-grid">
+        <div>
+          <p class="kicker reveal">Why it works</p>
+          <h2 class="h2 reveal">Grounded in how memory <em>actually</em> works.</h2>
+          <div class="method-points">
+            <div class="mp reveal d1">
+              <div class="mp-ic"><svg viewBox="0 0 24 24"><path d="M12 3a6 6 0 0 0-6 6c0 2.5 1.5 3.8 2.4 5 .6.8.6 2 .6 2h6s0-1.2.6-2c.9-1.2 2.4-2.5 2.4-5a6 6 0 0 0-6-6z"/><path d="M9.5 21h5"/></svg></div>
+              <div>
+                <h4>Active recall beats re-reading</h4>
+                <p>Pulling an answer out of your own head is one of the most reliably effective ways to learn. Passive highlighting feels productive but fades fast.</p>
+              </div>
+            </div>
+            <div class="mp reveal d2">
+              <div class="mp-ic"><svg viewBox="0 0 24 24"><path d="M12 7v5l3 2"/><circle cx="12" cy="12" r="8"/></svg></div>
+              <div>
+                <h4>Spaced repetition fights forgetting</h4>
+                <p>Revisiting a topic just as you're about to forget it strengthens the memory each time. The plan spaces your reds so they resurface at the right moment.</p>
+              </div>
+            </div>
+            <div class="mp reveal d3">
+              <div class="mp-ic"><svg viewBox="0 0 24 24"><path d="M4 20l6-6M14 4l6 6"/><circle cx="7" cy="17" r="3"/><circle cx="17" cy="7" r="3"/></svg></div>
+              <div>
+                <h4>Rating turns dread into a plan</h4>
+                <p>Naming what you don't know is weirdly calming. Once every topic has a colour, "I'm so behind" becomes a short, specific list you can actually work through.</p>
+              </div>
+            </div>
+          </div>
+          <p class="method-note reveal">These are well-established principles from learning science — no magic, no gimmicks. The app just makes them easy to follow when it's late and you're tired.</p>
+        </div>
+        <div class="reveal d2">
+          <span class="mock-glow" style="background:radial-gradient(circle,rgba(62,201,138,.4),transparent 70%);inset:0;opacity:.4"></span>
+          <div class="transform-viz" id="transformViz">
+            <div class="tv-head"><span>Your confidence over time</span><span class="wk" id="tvWeek">Week 1</span></div>
+            <div class="tv-track" id="tvTrack">
+              <div class="tv-line"><span class="tv-label">Equilibrium</span><div class="tv-cells" data-row="0"></div></div>
+              <div class="tv-line"><span class="tv-label">Calculus</span><div class="tv-cells" data-row="1"></div></div>
+              <div class="tv-line"><span class="tv-label">EM fields</span><div class="tv-cells" data-row="2"></div></div>
+              <div class="tv-line"><span class="tv-label">Genetics</span><div class="tv-cells" data-row="3"></div></div>
+              <div class="tv-line"><span class="tv-label">Module A</span><div class="tv-cells" data-row="4"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ============ AVAILABILITY ============ -->
+  <section class="avail">
+    <div class="section-pad" style="padding-left:28px;padding-right:28px">
+      <div class="avail-inner reveal">
+        <span class="aura aura-lime" style="width:360px;height:360px;bottom:-120px;left:-100px;opacity:.4"></span>
+        <div style="position:relative;z-index:2">
+          <p class="kicker">Availability</p>
+          <h2 class="h2">Works on any device.</h2>
+          <p>Open it in your browser or install it to your home screen — it even works offline on the train.</p>
+        </div>
+        <div class="avail-feats" style="position:relative;z-index:2">
+          <div class="af">
+            <div class="af-ic"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M8 20h8M12 17v3"/></svg></div>
+            <div><b>Runs in any browser</b><span>Nothing to download to get started</span></div>
+          </div>
+          <div class="af">
+            <div class="af-ic"><svg viewBox="0 0 24 24"><rect x="7" y="3" width="10" height="18" rx="2"/><path d="M11 18h2"/></svg></div>
+            <div><b>Installable app</b><span>Add to your home screen on phone or laptop</span></div>
+          </div>
+          <div class="af">
+            <div class="af-ic"><svg viewBox="0 0 24 24"><path d="M5 12a7 7 0 0 1 14 0"/><path d="M2 12a10 10 0 0 1 20 0"/><path d="M9 16l3 3 3-3"/></svg></div>
+            <div><b>Offline-friendly</b><span>Your progress is there with or without wifi</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ FAQ ============ -->
+  <section class="block" id="faq">
+    <span class="aura aura-mint" style="width:400px;height:400px;top:120px;right:-160px"></span>
+    <div class="wrap section-pad">
+      <p class="kicker center reveal" style="text-align:center">Questions</p>
+      <h2 class="h2 center reveal">Good to know.</h2>
+      <div class="faq-wrap">
+        <div class="faq-item reveal">
+          <button class="faq-q" aria-expanded="false">What is Zelly?<span class="faq-toggle"></span></button>
+          <div class="faq-a"><div class="faq-a-inner">It's a study tool that turns the NSW HSC syllabus into a checklist you can rate. You colour each dot point by how confident you feel, flag your priorities, and get a personalised plan that focuses your time on your weak spots.</div></div>
+        </div>
+        <div class="faq-item reveal">
+          <button class="faq-q" aria-expanded="false">How does the traffic-light method work?<span class="faq-toggle"></span></button>
+          <div class="faq-a"><div class="faq-a-inner">Every syllabus dot point gets a colour: red means you don't know it yet, amber means it's shaky, green means you're confident. Tapping cycles through them. Seeing your whole course in colour makes it obvious where to spend your next study session — and watching reds turn green as you learn is genuinely motivating.</div></div>
+        </div>
+        <div class="faq-item reveal">
+          <button class="faq-q" aria-expanded="false">Which subjects are covered?<span class="faq-toggle"></span></button>
+          <div class="faq-a"><div class="faq-a-inner">Twenty-three subjects across the main faculties: Biology, Chemistry, Physics and Health &amp; Movement Science; Maths Advanced and Standard 2; English Advanced and Standard; Business Studies, Legal Studies, CAFS, Modern History, Ancient History, Studies of Religion, Society and Culture and Geography; Visual Arts, Drama, Design and Technology and Engineering Studies; and French, Japanese and Korean Continuers — every dot point mapped from the current syllabus.</div></div>
+        </div>
+        <div class="faq-item reveal">
+          <button class="faq-q" aria-expanded="false">Is my progress private?<span class="faq-toggle"></span></button>
+          <div class="faq-a"><div class="faq-a-inner">Your ratings are yours. Your confidence colours and priorities are saved for your use so you can pick up where you left off — they're not sold or shared, and the whole thing is designed to work quietly in the background of your revision.</div></div>
+        </div>
+        <div class="faq-item reveal">
+          <button class="faq-q" aria-expanded="false">Is it aligned to the NSW syllabus?<span class="faq-toggle"></span></button>
+          <div class="faq-a"><div class="faq-a-inner">The dot points are drawn from the current NSW HSC syllabus for each subject, so what you're rating matches what you're actually examined on. It's a study companion, not an official NESA product — always check your school's guidance for the final word on your course.</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ FINAL CTA ============ -->
+  <section class="final" id="start">
+    <span class="aura aura-lime" style="width:600px;height:600px;top:-100px;left:50%;transform:translateX(-50%);opacity:.4"></span>
+    <h2 class="reveal">Start studying today.</h2>
+    <p class="reveal">Stop guessing what to revise. Colour your confidence, flag your priorities, and let the plan do the sorting.</p>
+    <a class="btn-primary reveal" href="signup.html" style="font-size:19px;padding:19px 46px">Start studying <span class="arw">→</span></a>
+    <div class="sub-note reveal">23 subjects · 1,281 dot points · works on any device</div>
+  </section>
+
+  <!-- ============ FOOTER ============ -->
+  <footer class="site">
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <div class="fm"><span class="dot"></span> Zelly</div>
+        <p>Traffic-light your syllabus, flag your priorities, and get a plan built around your weak spots. Built by an HSC student, for HSC students.</p>
+        <div class="foot-socials">
+          <a href="#" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg></a>
+          <a href="#" aria-label="TikTok"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 3c.3 2.2 1.7 3.9 3.9 4.2v2.6c-1.3.1-2.6-.3-3.9-1v5.7a5.6 5.6 0 1 1-5.6-5.6c.3 0 .6 0 .9.1v2.7a2.9 2.9 0 1 0 2 2.8V3z"/></svg></a>
+          <a href="#" aria-label="YouTube"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="6" width="18" height="12" rx="3"/><path d="M11 9.5l4 2.5-4 2.5z" fill="currentColor"/></svg></a>
+        </div>
+      </div>
+      <div class="foot-col">
+        <h5>Product</h5>
+        <a href="#how">How it works</a>
+        <a href="#subjects">Subjects</a>
+        <a href="#faq">FAQ</a>
+        <a href="signup.html">Start studying</a>
+      </div>
+      <div class="foot-col">
+        <h5>Subjects</h5>
+        <a href="#subjects">Sciences</a>
+        <a href="#subjects">Maths</a>
+        <a href="#subjects">English</a>
+        <a href="#subjects">Humanities</a>
+        <a href="#subjects">Languages</a>
+      </div>
+      <div class="foot-col">
+        <h5>About</h5>
+        <a href="#">The method</a>
+        <a href="#">Our story</a>
+        <a href="#">Privacy</a>
+        <a href="#">Contact</a>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <div class="made"><span class="dot" style="width:11px;height:11px"></span> Built by an HSC student, for HSC students.</div>
+      <div>© 2026 Zelly · Made in NSW for the class of the future.</div>
+    </div>
+  </footer>
+
+<script>
+(function(){
+  "use strict";
+  var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  /* ---------- subjects grid (grouped by faculty) ---------- */
+  var groups = {
+    sciences:[
+      ["Biology","M2","biology"],["Chemistry","M3","chemistry"],["Physics","M4","physics"],["Health & Movement Science","M5","hms"]
+    ],
+    maths:[
+      ["Maths Advanced","M6","maths-advanced"],["Maths Standard 2","M7","maths-standard-2"]
+    ],
+    english:[
+      ["English Advanced","M8","english-advanced"],["English Standard","M9","english-standard"]
+    ],
+    humanities:[
+      ["Business Studies","M10","business-studies"],["Legal Studies","M11","legal-studies"],["CAFS","M12","cafs"],
+      ["Modern History","M13","modern-history"],["Ancient History","M14","ancient-history"],["Studies of Religion","M15","studies-of-religion"],
+      ["Society and Culture","M12","socult"],["Geography","M13","geo"],
+      ["Visual Arts","M16","visual-arts"],["Drama","M14","drama"],["Design and Technology","M10","dt"],["Engineering Studies","M11","engineering"]
+    ],
+    languages:[
+      ["French Continuers","M8","french"],["Japanese Continuers","M9","japanese"],["Korean Continuers","M5","korean"]
+    ]
+  };
+  // simple line-glyph per subject index (reused set)
+  function icon(){
+    return '<svg viewBox="0 0 24 24"><path d="M4 5h16M4 12h16M4 19h10"/></svg>';
+  }
+  Object.keys(groups).forEach(function(key){
+    var host = document.querySelector('.subj-grid[data-group="'+key+'"]');
+    if(!host) return;
+    groups[key].forEach(function(pair){
+      var el = document.createElement("div");
+      el.className = "subj-card";
+      el.setAttribute("role","button");
+      el.setAttribute("tabindex","0");
+      el.setAttribute("data-slug", pair[2] || "");
+      el.innerHTML = '<span class="subj-ic">'+icon()+'</span><span class="subj-name">'+pair[0]+'</span>';
+      el.addEventListener("click", function(){ openSubjectModal(pair[2]); });
+      el.addEventListener("keydown", function(e){ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); openSubjectModal(pair[2]); } });
+      host.appendChild(el);
+    });
+  });
+
+  /* ---------- subject overview modal ---------- */
+  var OVERVIEW_LIST = [{"slug":"biology","name":"Biology","faculty":"Sciences","exam":"The exam: one written paper, <strong>100 marks · 3 hours</strong> (+5 min reading). <strong>Section I</strong> = 20 marks of multiple choice; <strong>Section II</strong> = 80 marks of short-answer &amp; extended-response (usually one longer ~7–9 mark response). <strong>Equal weighting</strong> across Modules 5–8 (Heredity, Genetic Change, Infectious Disease, and Non-infectious Disease &amp; Disorders), with Working Scientifically skills throughout.","topics":[{"title":"Module 5 — Heredity","blurb":"Reproduction · Cell Replication · DNA &amp; Polypeptide Synthesis · Genetic Variation · Inheritance Patterns in a Population"},{"title":"Module 6 — Genetic Change","blurb":"Mutation · Biotechnology · Genetic Technologies"},{"title":"Module 7 — Infectious Disease","blurb":"Causes · Responses to Pathogens &amp; Immunity · Prevention, Treatment and Control (How can the spread of infectious diseases be controlled?)"},{"title":"Module 8 — Non-infectious Disease and Disorders","blurb":"Homeostasis (How is an organism's internal environment maintained in response to a changing external environment?) · Causes and Effects (Do non-infectious diseases cause more deaths than infectious diseases?) · Epidemiology (Why are epidemiological studies used?) · Prevention (How can non-infectious diseases be prevented?) · Technologies and Disorders (How can technologies be used to assist people who experience disorders?)"}]},{"slug":"chemistry","name":"Chemistry","faculty":"Sciences","exam":"HSC Chemistry written exam: <strong>3 hours</strong> working time plus <strong>5 minutes</strong> reading time, worth <strong>100 marks</strong> total. <strong>Section I</strong> — Objective-response (multiple choice): <strong>20 questions</strong> worth <strong>20 marks</strong>. <strong>Section II</strong> — Short-answer and extended-response questions worth <strong>80 marks</strong>, including questions that may require extended writing of several paragraphs. All four modules (5–8) are examinable, and a data sheet, formulae sheet and periodic table are provided.","topics":[{"title":"Module 5 — Equilibrium and Acid Reactions","blurb":"Static and Dynamic Equilibrium — What happens when chemical reactions do not go through to completion? · Factors that Affect Equilibrium — What factors affect equilibrium and how? · Calculating the Equilibrium Constant (Keq) — How can the position of equilibrium be described and what does the equilibrium constant represent? · Solution Equilibria — How does solubility relate to chemical equilibrium?"},{"title":"Module 6 — Acid/Base Reactions","blurb":"Properties of Acids and Bases — What is an acid and what is a base? · Using Brønsted–Lowry Theory — What is the role of water in solutions of acids and bases? · Quantitative Analysis — How are solutions of acids and bases analysed?"},{"title":"Module 7 — Organic Chemistry","blurb":"Nomenclature — How do we systematically name organic chemical compounds? · Hydrocarbons — How can hydrocarbons be classified based on their structure and reactivity? · Products of Reactions Involving Hydrocarbons — What are the products of reactions of hydrocarbons and how do they react? · Alcohols — What are the properties of alcohols and how are they produced? · Reactions of Organic Acids and Bases — What are the properties of organic acids and bases? · Polymers — What are the properties and uses of polymers?"},{"title":"Module 8 — Applying Chemical Ideas","blurb":"Analysis of Inorganic Substances — How are the ions present in the environment identified and measured? · Analysis of Organic Substances — How is information about the reactivity and structure of organic compounds obtained? · Chemical Synthesis and Design — What are the implications for society of chemical synthesis and design?"}]},{"slug":"physics","name":"Physics","faculty":"Sciences","exam":"The HSC Physics written exam runs for <strong>3 hours</strong> plus <strong>5 minutes</strong> reading time and is worth <strong>100 marks</strong> total. <strong>Section I</strong> is worth <strong>20 marks</strong> and is objective-response (multiple choice) with <strong>20 questions</strong> (suggested time about 35 minutes). <strong>Section II</strong> is worth <strong>80 marks</strong> of short-answer and extended-response questions (suggested time about 2 hours 25 minutes), where the longer parts reward clear working, correct units and well-structured explanations. Questions can draw on any of the four Year 12 modules (Modules <strong>5–8</strong>), and a data sheet, formula sheet and periodic table are provided.","topics":[{"title":"Module 5 — Advanced Mechanics","blurb":"Projectile Motion — How can models that are used to explain projectile motion be used to analyse and make predictions? · Circular Motion — Why do objects move in circles? · Motion in Gravitational Fields — How does the force of gravity determine the motion of planets and satellites?"},{"title":"Module 6 — Electromagnetism","blurb":"Charged Particles, Conductors and Electric and Magnetic Fields — What happens to stationary and moving charged particles when they interact with an electric or magnetic field? · The Motor Effect — Under what circumstances is a force produced on a current-carrying conductor in a magnetic field? · Electromagnetic Induction — How are electric and magnetic fields related? · Applications of the Motor Effect — How has knowledge about the Motor Effect been applied to technological advances?"},{"title":"Module 7 — The Nature of Light","blurb":"Electromagnetic Spectrum — What is light? · Light: Wave Model — What evidence supports the classical wave model of light and what predictions can be made using this model? · Light: Quantum Model — What evidence supports the particle model of light and what are the implications of this evidence for the development of the quantum model of light? · Light and Special Relativity — How does the behaviour of light affect concepts of time, space and matter?"},{"title":"Module 8 — From the Universe to the Atom","blurb":"Origins of the Elements — What evidence is there for the origins of the elements? · Structure of the Atom — How is it known that atoms are made up of protons, neutrons and electrons? · Quantum Mechanical Nature of the Atom — How is it known that classical physics cannot explain the properties of the atom? · Properties of the Nucleus — How can the energy of the atomic nucleus be harnessed? · Deep Inside the Atom — How is it known that human understanding of matter is still incomplete?"}]},{"slug":"hms","name":"Health & Movement Science","faculty":"Sciences","exam":"The exam: one written paper, <strong>100 marks · 3 hours</strong> (+10 min reading), in <strong>three sections</strong> — multiple choice, short answer, and extended response. All questions are compulsory (no choice of essay), with roughly <strong>equal weighting</strong> across the two focus areas: <em>Health in an Australian &amp; global context</em> and <em>Training for improved performance</em>.","topics":[{"title":"Health in an Australian &amp; global context","blurb":"How healthy are Australians? · How does Australia's healthcare system work towards better health for all? · How is technology &amp; data impacting the healthcare system? · What actions are needed to promote &amp; improve health?"},{"title":"Training for Improved Performance","blurb":"Personalising exercise assessment &amp; prescription · How does training influence movement &amp; performance? · How does training differ for individual &amp; group sports? · Sleep, nutrition &amp; supplementation · How do individuals train for sustained movement &amp; performance?"}]},{"slug":"maths-advanced","name":"Maths Advanced","faculty":"Maths","exam":"HSC Mathematics Advanced exam: <strong>3 hours</strong> working time plus <strong>10 minutes</strong> reading time, worth <strong>100 marks</strong> total. <strong>Section I</strong> = <strong>10</strong> multiple-choice questions worth <strong>10 marks</strong> (about 15 min). <strong>Section II</strong> = extended-response questions worth <strong>90 marks</strong> (about 2h 45min), where full working must be shown. A NESA reference sheet is provided; an approved calculator is allowed. Questions draw on both Year 11 and Year 12 content across Functions, Trigonometry, Calculus, Financial Mathematics and Statistical Analysis.","topics":[{"title":"Functions","blurb":"MA-F2 Graphing Techniques"},{"title":"Trigonometric Functions","blurb":"MA-T3 Trigonometric Functions and Graphs"},{"title":"Calculus","blurb":"MA-C2 Differential Calculus · MA-C3 Applications of Differentiation · MA-C4 Integral Calculus"},{"title":"Financial Mathematics","blurb":"MA-M1.1 Modelling Investments and Loans · MA-M1.2 Arithmetic Sequences and Series · MA-M1.3 Geometric Sequences and Series · MA-M1.4 Financial Applications of Sequences and Series"},{"title":"Statistical Analysis","blurb":"MA-S2.1 Data and Summary Statistics · MA-S2.2 Bivariate Data Analysis · MA-S3.1 Continuous Random Variables · MA-S3.2 The Normal Distribution"}]},{"slug":"maths-standard-2","name":"Maths Standard 2","faculty":"Maths","exam":"<p>The HSC <strong>Mathematics Standard 2</strong> examination is worth <strong>100 marks</strong> with <strong>10 minutes</strong> reading time and <strong>2 hours 30 minutes</strong> working time.</p><ul><li><strong>Section I</strong> &ndash; <strong>15 marks</strong>, <strong>15</strong> multiple-choice questions (roughly <strong>1</strong> mark each).</li><li><strong>Section II</strong> &ndash; <strong>85 marks</strong>, extended-response questions worth from <strong>1</strong> to about <strong>5</strong> marks each; show all working as marks are awarded for method.</li></ul><p>A NESA-approved calculator and the common <strong>Mathematics Standard reference sheet</strong> (formulae and data) are provided. Content is drawn from both Year 11 and Year 12, but Year 12 topics dominate. Bring drawing instruments for network and scale-diagram questions.</p>","topics":[{"title":"Algebra","blurb":"MS-A4 Types of relationships – Simultaneous linear equations · MS-A4 Types of relationships – Non-linear relationships"},{"title":"Measurement","blurb":"MS-M6 Non-right-angled trigonometry – Right-angled review · MS-M6 Non-right-angled trigonometry – Sine & cosine rules · MS-M7 Rates and ratios – Rates · MS-M7 Rates and ratios – Ratios"},{"title":"Financial Mathematics","blurb":"MS-F4 Investments and loans – Investments · MS-F4 Investments and loans – Depreciation & loans · MS-F5 Annuities"},{"title":"Statistical Analysis","blurb":"MS-S4 Bivariate data analysis · MS-S5 The normal distribution"},{"title":"Networks","blurb":"MS-N2 Network concepts · MS-N3 Critical path analysis"}]},{"slug":"english-advanced","name":"English Advanced","faculty":"English","exam":"The exam: <strong>Paper 1</strong> = Common Module (Texts &amp; Human Experiences) — unseen short-answers + an essay (50 marks, 1.5 hrs). <strong>Paper 2</strong> = Module A + B + C, one response each (25 marks each, 2 hrs).","topics":[{"title":"Common Module — Texts &amp; Human Experiences","blurb":"Paper 1"},{"title":"Module A — Textual Conversations","blurb":"Paper 2"},{"title":"Module B — Critical Study","blurb":"Paper 2"},{"title":"Module C — The Craft of Writing","blurb":"Paper 2"}]},{"slug":"english-standard","name":"English Standard","faculty":"English","exam":"The exam (current 2017 syllabus): <strong>Paper 1</strong> — Texts &amp; Human Experiences (Common Module): unseen-text short answers (20) + an essay on your prescribed text (20) = <strong>40 marks, 1.5 hrs</strong> (+10 min reading). <strong>Paper 2</strong> — three sections, one each for Module A (Language, Identity &amp; Culture), Module B (Close Study of Literature) and Module C (The Craft of Writing), 20 marks each = <strong>60 marks, 2 hrs</strong> (+5 min reading).","topics":[{"title":"Common Module — Texts &amp; Human Experiences (Paper 1)","blurb":"6 focus skills"},{"title":"Module A — Language, Identity and Culture (Paper 2)","blurb":"4 focus skills"},{"title":"Module B — Close Study of Literature (Paper 2)","blurb":"4 focus skills"},{"title":"Module C — The Craft of Writing (Paper 2)","blurb":"4 focus skills"}]},{"slug":"business-studies","name":"Business Studies","faculty":"Humanities","exam":"The HSC Business Studies written exam runs for <strong>3 hours</strong> plus <strong>5 minutes</strong> reading time and is worth <strong>100 marks</strong>. It has four sections drawn from the four HSC topics (Operations, Marketing, Finance, Human Resources). <strong>Section I</strong> is <strong>20</strong> multiple-choice questions (<strong>20 marks</strong>, ~35 min). <strong>Section II</strong> is short-answer questions (<strong>40 marks</strong>, ~1 hr 15 min). <strong>Section III</strong> is a stimulus-based business report (<strong>20 marks</strong>, ~35 min). <strong>Section IV</strong> is an extended-response essay where you choose from options covering the topics (<strong>20 marks</strong>, ~35 min). Answer in business language, use case studies, and structure long responses clearly.","topics":[{"title":"Operations","blurb":"Role of operations management · Influences · Operations processes · Operations strategies"},{"title":"Marketing","blurb":"Role of marketing · Influences on marketing · Marketing process · Marketing strategies"},{"title":"Finance","blurb":"Role of financial management · Influences on financial management · Processes of financial management · Financial management strategies"},{"title":"Human Resources","blurb":"Role of human resource management · Key influences · Processes of human resource management · Strategies in human resource management · Effectiveness of human resource management"}]},{"slug":"legal-studies","name":"Legal Studies","faculty":"Humanities","exam":"<p>The HSC Legal Studies written exam runs for <strong>3 hours</strong> plus <strong>5 minutes</strong> reading time and is worth <strong>100 marks</strong>.</p><ul><li><strong>Section I - Crime & Human Rights (20 marks):</strong> <strong>20</strong> multiple-choice (objective response) questions drawn from the two core topics.</li><li><strong>Section II - Crime & Human Rights (30 marks):</strong> short-answer and extended-response questions. Typically a Human Rights short-answer set worth <strong>15 marks</strong> and a Crime extended response (essay) worth <strong>15 marks</strong>.</li><li><strong>Section III - Options (50 marks):</strong> <strong>two</strong> extended-response essays worth <strong>25 marks</strong> each - one for each Option studied (e.g. Family, World Order). Choose from a set of alternative questions within each option.</li></ul><p>Core (Crime + Human Rights) = <strong>50 marks</strong>; Options = <strong>50 marks</strong>. Use of relevant legislation, cases, media and legal terminology is expected throughout, especially in extended responses.</p>","topics":[{"title":"Crime","blurb":"The nature of crime · The criminal investigation process · The criminal trial process · Sentencing and punishment · Young offenders · International crime"},{"title":"Human Rights","blurb":"The nature and development of human rights · Promoting and enforcing human rights · Contemporary human rights issue"},{"title":"Family (option)","blurb":"The nature of family law · Responses to problems in family relationships · Contemporary issues concerning family law"},{"title":"World Order (option)","blurb":"The nature of world order · Responses to world order · Contemporary issues concerning world order"}]},{"slug":"cafs","name":"CAFS","faculty":"Humanities","exam":"The HSC CAFS written exam runs for <strong>3 hours</strong> (plus <strong>5 minutes</strong> reading time) and is worth <strong>100 marks</strong>. <strong>Section I</strong> (~<strong>20 marks</strong>) is objective-response and short-answer questions drawn from the three core modules. <strong>Section II</strong> (~<strong>40 marks</strong>) is short-answer and extended-response questions on the core modules, including research methodology. <strong>Section III</strong> (~<strong>15 marks</strong> each) contains an extended-response question for each option module — students answer on the <strong>one</strong> option they studied. The Independent Research Project (IRP) is a school-based assessment task, not part of the written exam. The exam contributes <strong>50%</strong> to the HSC mark.","topics":[{"title":"Research Methodology (Core)","blurb":"Research fundamentals · Research methods · The research process · Independent Research Project (IRP)"},{"title":"Groups in Context (Core)","blurb":"Types of groups · Nature of each group · Issues of concern for each group · Creating positive social environments (in-depth groups) · Positive influences on community attitudes (in-depth groups)"},{"title":"Parenting and Caring (Core)","blurb":"Parents and carers · Becoming a parent or carer · Roles of parents and carers · Factors affecting roles · Support for parents and carers"},{"title":"Family and Societal Interactions (Option)","blurb":"Families and their needs · Government support and protection · Community support across the lifespan"},{"title":"Social Impact of Technology (Option)","blurb":"Defining technology · Access to and acceptance of technology · Impact on lifestyle · Issues of technological development · Selected technology study"},{"title":"Individuals and Work (Option)","blurb":"Nature of work · The labour force · Rights and responsibilities · Managing roles"}]},{"slug":"modern-history","name":"Modern History","faculty":"Humanities","exam":"HSC Modern History written exam: <strong>3 hours</strong> working time plus <strong>5 minutes</strong> reading time, worth <strong>100 marks</strong> total across <strong>4 sections</strong> of <strong>25 marks</strong> each (roughly <strong>45 min</strong> per section). <strong>Section I</strong> — Power and Authority in the Modern World 1919-1946 (Core): <strong>source-based</strong> short-answer questions using a stimulus source booklet, <strong>25 marks</strong>. <strong>Section II</strong> — National Study: one extended-response/essay from a choice of questions on your studied nation, <strong>25 marks</strong>. <strong>Section III</strong> — Peace and Conflict: one extended-response/essay on your studied conflict, <strong>25 marks</strong>. <strong>Section IV</strong> — Change in the Modern World: one extended-response/essay on your studied change option, <strong>25 marks</strong>.","topics":[{"title":"Core Study — Power and Authority in the Modern World 1919–1946","blurb":"Survey — The peace treaties that ended World War I and their consequences · The rise of dictatorships after World War I · The Nazi regime to 1939 · The search for peace and security in the world"},{"title":"National Study (option — varies by school)","blurb":"Available National Study options — study ONE · Common option — Russia and the Soviet Union 1917–1941: focus points"},{"title":"Peace and Conflict (option — varies by school)","blurb":"Available Peace and Conflict options — study ONE · Common option — Conflict in Europe 1935–1945: focus points · Common option — Conflict in the Pacific 1937–1951: focus points · Common option — The Cold War 1945–1991: focus points"},{"title":"Change in the Modern World (option — varies by school)","blurb":"Available Change options — study ONE · Common option — Civil Rights in the USA 1945–1968: focus points · Common option — Apartheid in South Africa 1960–1994: focus points"}]},{"slug":"ancient-history","name":"Ancient History","faculty":"Humanities","exam":"<strong>HSC written examination:</strong> <strong>3 hours</strong> plus <strong>5 minutes</strong> reading time, <strong>100 marks</strong> total, <strong>four</strong> sections each worth <strong>25 marks</strong>. <strong>Section I &mdash; Core Study: Cities of Vesuvius (Pompeii &amp; Herculaneum)</strong>: source-based; <strong>3&ndash;4</strong> questions where you analyse and interpret provided sources and apply your own knowledge; one question worth <strong>10&ndash;15</strong> marks. <strong>Section II &mdash; Ancient Societies</strong>: answer on your <strong>one</strong> studied topic (of <strong>8</strong>); question has <strong>3&ndash;4</strong> parts, one part worth <strong>10&ndash;15</strong> marks. <strong>Section III &mdash; Personalities in Their Times</strong>: answer on your <strong>one</strong> studied personality (of <strong>10</strong>); <strong>2&ndash;3</strong> parts, at least one worth <strong>10&ndash;15</strong> marks. <strong>Section IV &mdash; Historical Periods</strong>: answer on your <strong>one</strong> studied period (of <strong>10</strong>, each with a choice of <strong>2</strong> alternative questions); a single <strong>extended-response</strong> essay of about <strong>1000</strong> words (~8 pages). Roughly <strong>45 minutes</strong> per section is the standard guide.","topics":[{"title":"Core Study — Cities of Vesuvius: Pompeii and Herculaneum","blurb":"Survey — geographical and historical context · The nature of the sources and evidence · The eruption · The economy · Social structure · Local political life · Everyday life · Public buildings · Private buildings · Influence of Greek and Egyptian cultures · Religion · Investigating, reconstructing and preserving the past"},{"title":"Ancient Societies (option — varies by school)","blurb":"Common option choices (study ONE) · Required focus points (apply to your chosen society)"},{"title":"Personalities in Their Times (option — varies by school)","blurb":"Common option choices (study ONE) · Required focus points (apply to your chosen personality)"},{"title":"Historical Periods (option — varies by school)","blurb":"Common option choices (study ONE) · Required focus points (apply to your chosen period)"}]},{"slug":"studies-of-religion","name":"Studies of Religion","faculty":"Humanities","exam":"<p><strong>Studies of Religion I (1 Unit)</strong> HSC exam: <strong>5 min</strong> reading + <strong>1 hour 30 min</strong> working, <strong>50 marks</strong>. <strong>Section I</strong> — Religion and Belief Systems in Australia post-1945 (<strong>15 marks</strong>, multiple-choice + short answer). <strong>Section II</strong> — Religious Tradition Depth Study 1 (<strong>15 marks</strong>, choose ONE tradition). <strong>Section III</strong> — Religious Tradition Depth Study 2 (<strong>20 marks</strong>, choose a DIFFERENT tradition). The two depth studies must be on different traditions from Buddhism, Christianity, Hinduism, Islam, Judaism.</p><p><strong>Studies of Religion II (2 Unit)</strong> HSC exam: <strong>5 min</strong> reading + <strong>3 hours</strong> working, <strong>100 marks</strong>, <strong>4 sections</strong>. <strong>Section I</strong> (<strong>30 marks</strong>) = Religion and Belief Systems in Australia post-1945 (<strong>15</strong>) + Religion and Non-Religion (<strong>15</strong>). <strong>Section II</strong> — Religious Tradition Depth Studies (<strong>30 marks</strong>, TWO traditions). <strong>Section III</strong> — Religious Tradition Depth Study (<strong>20 marks</strong>, a further/different tradition). <strong>Section IV</strong> — Religion and Peace (<strong>20 marks</strong>, extended response). Structure reflects the 2024 HSC papers; exact section marks can vary slightly year to year.</p>","topics":[{"title":"Religion and Belief Systems in Australia post-1945 (SOR I & II)","blurb":"Changing patterns of religious adherence since 1945 · The contemporary religious landscape · Religious dialogue in multi-faith Australia · Religion and Reconciliation"},{"title":"Religious Tradition Depth Study 1 — Christianity (SOR I & II)","blurb":"Significant People and Ideas · Ethics · Significant Practices in the Life of Adherents"},{"title":"Religious Tradition Depth Study 2 — Islam (SOR I & II)","blurb":"Significant People and Ideas · Ethics · Significant Practices in the Life of Adherents"},{"title":"Studies of Religion II — extension (2 Unit)","blurb":"How SOR II extends SOR I · Religion and Peace (SOR II only) · Religion and Non-Religion (SOR II only) · Note on scope (verify against NESA)"}]},{"slug":"visual-arts","name":"Visual Arts","faculty":"Humanities","exam":"<strong>Two halves, 50% each.</strong> Body of Work — your major artwork, submitted later (lock the concept now). Written exam — <strong>Section I</strong> (25 marks): short answers on unseen artworks; <strong>Section II</strong> (25 marks): one essay.","topics":[{"title":"Practice","blurb":"Artmaking, conceptual & material practice — how artists work."},{"title":"The Conceptual Framework","blurb":"Artist · Artwork · World · Audience and the relationships between them."},{"title":"The Frames","blurb":"Subjective, structural, cultural & postmodern ways of reading art."}]},{"slug":"french","name":"French Continuers","faculty":"Languages","exam":"<p>The HSC French Continuers examination is worth <strong>100 marks</strong>, split across an oral examination and a written examination (2009 syllabus, examined from 2010 to now).</p><p><strong>Oral examination</strong> (<strong>20 marks</strong>, about <strong>10 minutes</strong>): a general conversation in French with the examiner about the candidate's personal world and experiences, drawn from the prescribed topics.</p><p><strong>Written examination</strong> (<strong>80 marks</strong>, <strong>10 min</strong> reading + <strong>2 hours 50 min</strong> working). <strong>Section I &ndash; Listening &amp; Responding</strong> (<strong>25 marks</strong>): about 8 questions answered in English on French audio texts, each played twice. <strong>Section II &ndash; Reading &amp; Responding</strong> (<strong>40 marks</strong>): Part A (<strong>25 marks</strong>) comprehension questions in English on French written texts; Part B (<strong>15 marks</strong>) an extended response in French of about 200 words to a stimulus text. <strong>Section III &ndash; Writing in French</strong> (<strong>15 marks</strong>): one extended text of about 200 words in French, chosen from set options (informative, persuasive or reflective).</p>","topics":[{"title":"Theme 1 — The individual","blurb":"Personal world · Relationships · Education and future aspirations · Leisure and interests"},{"title":"Theme 2 — The French-speaking communities","blurb":"Daily lifestyles · Arts and entertainment · Traditions and celebrations · The francophone world and culture"},{"title":"Theme 3 — The changing world","blurb":"The world of work · Travel and tourism · Youth issues and culture · Current issues"},{"title":"Macro-skills (Examination skills)","blurb":"Listening &amp; responding · Reading &amp; responding · Writing in French (text types) · Speaking (oral examination)"},{"title":"Language systems (Grammar &amp; vocabulary)","blurb":"Verbs and tenses · Pronouns and agreement · Sentence structure · Vocabulary domains"}]},{"slug":"japanese","name":"Japanese Continuers","faculty":"Languages","exam":"<p>The HSC Japanese Continuers course is examined in two parts totalling <strong>100 marks</strong>. The <strong>Oral examination</strong> (<strong>20 marks</strong>, approximately <strong>10 minutes</strong>) is an interview-style conversation with an examiner on the prescribed topics, viewed from the perspective of the candidate's personal world.</p><p>The <strong>Written examination</strong> (<strong>80 marks</strong>, <strong>3 hours</strong> including <strong>10 minutes</strong> reading time) has three sections. <strong>Section I &mdash; Listening &amp; Responding</strong> (<strong>25 marks</strong>): aural texts played twice, answered mostly in English with some responses in Japanese. <strong>Section II &mdash; Reading &amp; Responding</strong> (<strong>40 marks</strong>): Part A comprehension of Japanese texts answered in English (~25 marks), Part B an extended response in Japanese (~15 marks, ~400 ji) based on a stimulus text. <strong>Section III &mdash; Writing in Japanese</strong> (<strong>15 marks</strong>): a short informative/descriptive text (~150 ji) plus one longer evaluative, persuasive or reflective text (~400 ji). Monolingual and/or bilingual dictionaries are permitted in the written exam.</p>","topics":[{"title":"Theme 1 &mdash; The individual","blurb":"Personal world · Daily life · Leisure · Future plans"},{"title":"Theme 2 &mdash; The Japanese-speaking communities","blurb":"Travelling in Japan · Living in Japan · Cultural life"},{"title":"Theme 3 &mdash; The changing world","blurb":"The world of work · Current issues"},{"title":"Listening &amp; Responding (Written Exam Section I)","blurb":"Aural comprehension skills"},{"title":"Reading &amp; Responding (Written Exam Section II)","blurb":"Part A &mdash; comprehension in English · Part B &mdash; responding in Japanese"},{"title":"Writing in Japanese (text types &amp; Section III)","blurb":"Personal &amp; correspondence text types · Informative &amp; evaluative text types"},{"title":"Speaking (Oral Examination)","blurb":"Conversation skills"},{"title":"Japanese language systems","blurb":"Script &amp; kanji · Grammar structures · Vocabulary domains"}]},{"slug":"korean","name":"Korean Continuers","faculty":"Languages","exam":"<p><strong>Oral examination</strong> (<strong>20 marks</strong>, held separately before the written exam): a <strong>conversation of approximately 10 minutes</strong> between the candidate and examiner, in Korean, on the prescribed topics as they relate to the candidate's own experience. It assesses spontaneous communication, accuracy and range of language.</p><p><strong>Written examination</strong> (<strong>80 marks</strong>, <strong>3 hours</strong> including <strong>10 minutes</strong> reading time). <strong>Section I &mdash; Listening &amp; Responding (25 marks)</strong>: spoken Korean texts (played twice) with questions answered in English. <strong>Section II &mdash; Reading &amp; Responding (40 marks)</strong>: <strong>Part A (25 marks)</strong> written Korean texts with questions answered in English, and <strong>Part B (15 marks)</strong> an extended response written in Korean based on a stimulus text. <strong>Section III &mdash; Writing in Korean (15 marks)</strong>: Question 1 a short response (<strong>5 marks</strong>) and Question 2 an extended response (<strong>10 marks</strong>, choice of alternatives). Oral 20 + written 80 = <strong>100 marks</strong> total.</p>","topics":[{"title":"Theme 1 — The individual","blurb":"The self and family · Education · Everyday life and activities"},{"title":"Theme 2 — The Korean-speaking communities","blurb":"Special celebrations · Korea as a tourist destination · Daily life in Korea · Migrant experiences in Australia"},{"title":"Theme 3 — The changing world","blurb":"Family life · The world of work"},{"title":"Listening &amp; responding","blurb":"Comprehending spoken Korean"},{"title":"Reading &amp; responding","blurb":"Understanding written Korean"},{"title":"Writing in Korean","blurb":"Prescribed text types · Writing skills"},{"title":"Speaking &amp; oral interaction","blurb":"The oral conversation"},{"title":"Hangul &amp; script handling","blurb":"Writing system"},{"title":"Key grammatical structures","blurb":"Verbs, honorifics and endings · Particles and clause linking"},{"title":"Vocabulary domains","blurb":"Controlling vocabulary"}]},{"slug":"engineering","name":"Engineering Studies","faculty":"Technology","exam":"The HSC Engineering Studies examination is <strong>one written paper</strong> worth <strong>100 marks</strong>, with <strong>5 minutes</strong> reading time plus <strong>3 hours</strong> working time. <strong>Section I</strong> (<strong>20 marks</strong>) is <strong>20 multiple-choice</strong> questions drawn from across the four HSC modules (about 30 minutes). <strong>Section II</strong> (<strong>80 marks</strong>) is short-answer and extended-response questions covering Civil Structures, Personal &amp; Public Transport, Aeronautical Engineering and Telecommunications Engineering, requiring calculations, engineering drawing and applied analysis with working shown. Structure reflects recent HSC papers (2011 syllabus).","topics":[{"title":"Civil Structures","blurb":"Scope of the profession · Historical and societal influences · Engineering materials · Engineering mechanics and hydraulics · Communication"},{"title":"Personal and Public Transport","blurb":"Scope of the profession · Historical and societal influences · Engineering materials · Engineering mechanics · Communication"},{"title":"Aeronautical Engineering","blurb":"Scope of the profession · Historical and societal influences · Engineering materials · Engineering mechanics and aerodynamics · Communication"},{"title":"Telecommunications Engineering","blurb":"Scope of the profession · Historical and societal influences · Engineering materials · Engineering electricity and electronics · Communication"},{"title":"Engineering Report &amp; Professional Practice (cross-cutting)","blurb":"The engineering report · Professional practice · Engineering drawing conventions"}]},{"slug":"socult","name":"Society and Culture","faculty":"Humanities","exam":"The HSC Society and Culture written examination runs for <strong>2 hours</strong> (plus <strong>5 minutes</strong> reading time) and is worth <strong>60 marks</strong>. <strong>Section I</strong> — Social and Cultural Continuity and Change (the Core), <strong>20 marks</strong>, made up of objective-response questions (~<strong>8 marks</strong>) and short-answer questions (~<strong>12 marks</strong>). <strong>Section II</strong> — Depth Studies, <strong>40 marks</strong>: four depth study questions are provided and students answer on the <strong>two</strong> depth studies they studied (each <strong>20 marks</strong>, typically a shorter part worth ~5 marks and an extended response worth ~15 marks). The written exam is worth <strong>60%</strong> of the HSC mark. The <strong>Personal Interest Project (PIP)</strong> is a research project worth <strong>40%</strong>, marked externally and submitted before the written exam. Course based on the NESA Society and Culture Stage 6 Syllabus (2013).","topics":[{"title":"Fundamental Concepts and Social and Cultural Literacy","blurb":"The five fundamental concepts · Additional concepts and literacy"},{"title":"Social and Cultural Research Methods","blurb":"Types of data · The research methods · Rigour and ethics"},{"title":"Social and Cultural Continuity and Change (Core)","blurb":"The nature of continuity and change · The country study (one country other than Australia) · Cross-cultural comparison"},{"title":"Personal Interest Project (PIP) (Core)","blurb":"Nature and purpose · Methodology and process · Structure and requirements"},{"title":"Depth Study — Popular Culture","blurb":"Nature of popular culture · The chosen popular culture (case study)"},{"title":"Depth Study — Belief Systems and Ideologies","blurb":"Nature of belief systems and ideologies · Belief systems, the individual and society"},{"title":"Depth Study — Social Inclusion and Exclusion","blurb":"Nature of inclusion and exclusion · Groups, institutions and change"},{"title":"Depth Study — Social Conformity and Nonconformity","blurb":"Nature of conformity and nonconformity · Groups, deviance and change"}]},{"slug":"drama","name":"Drama","faculty":"Creative","exam":"<p>HSC Drama is externally assessed out of <strong>100 marks</strong> across three components: a <strong>Written Paper (40 marks)</strong>, the <strong>Group Performance (30 marks)</strong> and the <strong>Individual Project (30 marks)</strong>.</p><p>The <strong>Written Paper</strong> runs for <strong>1 hour 30 minutes</strong> plus <strong>5 minutes</strong> reading time. <strong>Section I &mdash; Core: Australian Drama and Theatre (20 marks)</strong> is one extended-response question (about 800 words) on the studied topic. <strong>Section II &mdash; Studies in Drama and Theatre (20 marks)</strong> offers one extended-response question per topic; students answer on the ONE topic they studied (about 800 words).</p><p>The <strong>Group Performance</strong> is an original, collaboratively devised piece of <strong>8&ndash;12 minutes</strong> for a group of <strong>3&ndash;6</strong> students, marked out of 30 (three criteria of 10 marks). The <strong>Individual Project</strong> is ONE self-selected project (Performance, a Design option, Video Drama, Critical Analysis or Scriptwriting), also marked out of 30. Based on the NESA Drama Stage 6 Syllabus (2009) and the 2025&ndash;2027 course prescriptions.</p>","topics":[{"title":"Australian Drama and Theatre (Core &mdash; Written Section I)","blurb":"Studying the Core (both topics) · Topic 1 &mdash; Dramatic Traditions in Australia · Topic 2 &mdash; Contemporary Australian Theatre Practice"},{"title":"Studies in Drama and Theatre (Written Section II)","blurb":"How the topic is studied · The seven topic options"},{"title":"The Group Performance (30 marks)","blurb":"Devising the performance · Performing &amp; dramatic meaning · Process &amp; documentation"},{"title":"The Individual Project (30 marks &mdash; choose ONE)","blurb":"Choosing &amp; documenting the project · Project options &amp; their requirements"}]},{"slug":"dt","name":"Design and Technology","faculty":"Technology","exam":"The HSC Design &amp; Technology written examination runs for <strong>1 hour 30 minutes</strong> working time (plus <strong>5 minutes</strong> reading time) and is worth <strong>40 marks</strong>. <strong>Section I</strong> (<strong>10 marks</strong>) is objective-response (multiple-choice) questions. <strong>Section II</strong> (<strong>15 marks</strong>) is short-answer questions covering Innovation and Emerging Technologies and the principles of designing and producing. <strong>Section III</strong> (<strong>15 marks</strong>) is one extended-response question (about 600 words). The written paper counts for <strong>40%</strong> of the HSC mark; the externally-marked <strong>Major Design Project</strong> (project and portfolio) is worth <strong>60 marks / 60%</strong>. Structure reflects recent NESA exam specifications.","topics":[{"title":"Designing and Producing","blurb":"Innovation and emerging technologies · The impact of design · Designing and producing in industrial and commercial settings · Factors affecting design and production · The roles of designers"},{"title":"The Major Design Project (MDP)","blurb":"Identifying and researching a need · Project proposal and project management · Development of design ideas · Production and realisation · Evaluation · The folio / portfolio"}]},{"slug":"geo","name":"Geography","faculty":"Humanities","exam":"The HSC Geography written exam runs for <strong>3 hours</strong> (plus <strong>10 minutes</strong> reading time) and is worth <strong>100 marks</strong>. A Stimulus Booklet is provided and all questions are compulsory. <strong>Section I</strong> (<strong>15 marks</strong>) is <strong>15 multiple-choice</strong> questions. <strong>Section II</strong> (<strong>45 marks</strong>) is short-answer questions using stimulus, drawn across the focus areas. <strong>Section III</strong> (<strong>20 marks</strong>) is a structured extended-response question. <strong>Section IV</strong> (<strong>20 marks</strong>) is an extended-response (essay) question. Questions assess Ecosystems &amp; global biodiversity, Rural &amp; urban places and Global sustainability, plus geographical tools and skills. This structure reflects the reformed Geography 11&ndash;12 (2022) syllabus, first examined in the 2025 HSC.","topics":[{"title":"Ecosystems and Global Biodiversity","blurb":"Ecosystem functioning · Biodiversity and the value of ecosystems · Vulnerability and resilience · Global biodiversity and management"},{"title":"Rural and Urban Places","blurb":"Nature of rural and urban places · Urbanisation and settlement change · World cities and megacities · Place-based studies and fieldwork"},{"title":"Global Sustainability","blurb":"The concept of sustainability · A global economic activity · Global responses and fieldwork"},{"title":"Geographical Concepts, Skills, Tools and Fieldwork","blurb":"Concepts and inquiry skills · Maps · Graphs and statistics · Spatial and visual technologies · Fieldwork"}]}];
+  var OVERVIEW = {};
+  OVERVIEW_LIST.forEach(function(o){ OVERVIEW[o.slug] = o; });
+  function smEsc(s){ return (s==null?"":String(s)); }
+  function openSubjectModal(slug){
+    var s = OVERVIEW[slug];
+    var smEl = document.getElementById("subjModal"), smBody = document.getElementById("smBody");
+    if(!s || !smEl || !smBody) return;
+    var topics = s.topics.map(function(t,i){
+      return '<div class="sm-topic"><div class="sm-num">'+(i+1)+'</div><div class="sm-tbody">'+
+             '<div class="sm-ttitle">'+smEsc(t.title)+'</div>'+
+             (t.blurb?'<div class="sm-tblurb">'+smEsc(t.blurb)+'</div>':'')+
+             '</div></div>';
+    }).join("");
+    smBody.innerHTML =
+      '<span class="sm-eyebrow"><span class="sm-dot"></span> '+smEsc(s.faculty)+'</span>'+
+      '<h3 class="sm-title" id="smTitle">'+smEsc(s.name)+'</h3>'+
+      (s.exam?'<div class="sm-exam"><div class="sm-exam-h">The exam</div><p>'+s.exam+'</p></div>':'')+
+      '<div class="sm-seclabel">What’s in it</div>'+
+      '<div class="sm-topics">'+topics+'</div>'+
+      '<a class="sm-cta" href="signup.html">Track my confidence in '+smEsc(s.name)+' →</a>';
+    smEl.classList.add("open");
+    smEl.setAttribute("aria-hidden","false");
+    document.body.style.overflow = "hidden";
+  }
+  function closeSubjectModal(){
+    var smEl = document.getElementById("subjModal");
+    if(!smEl) return;
+    smEl.classList.remove("open");
+    smEl.setAttribute("aria-hidden","true");
+    document.body.style.overflow = "";
+  }
+  document.addEventListener("click", function(e){ if(e.target && e.target.hasAttribute && e.target.hasAttribute("data-close")) closeSubjectModal(); });
+  document.addEventListener("keydown", function(e){ if(e.key==="Escape") closeSubjectModal(); });
+
+  /* ---------- sticky nav shadow on scroll ---------- */
+  var nav = document.getElementById("nav");
+  function navScroll(){
+    if(!nav) return;
+    if((window.scrollY||window.pageYOffset) > 20) nav.classList.add("scrolled");
+    else nav.classList.remove("scrolled");
+  }
+  window.addEventListener("scroll", navScroll, {passive:true});
+  navScroll();
+
+  /* ---------- FAQ accordion ---------- */
+  var faqs = Array.prototype.slice.call(document.querySelectorAll(".faq-item"));
+  faqs.forEach(function(item){
+    var btn = item.querySelector(".faq-q");
+    var ans = item.querySelector(".faq-a");
+    if(!btn) return;
+    btn.addEventListener("click", function(){
+      var isOpen = item.classList.contains("open");
+      // close all
+      faqs.forEach(function(other){
+        other.classList.remove("open");
+        other.querySelector(".faq-a").style.maxHeight = "0px";
+        other.querySelector(".faq-q").setAttribute("aria-expanded","false");
+      });
+      if(!isOpen){
+        item.classList.add("open");
+        ans.style.maxHeight = ans.scrollHeight + "px";
+        btn.setAttribute("aria-expanded","true");
+      }
+    });
+  });
+  // recompute open panel height on resize
+  window.addEventListener("resize", function(){
+    var open = document.querySelector(".faq-item.open .faq-a");
+    if(open) open.style.maxHeight = open.scrollHeight + "px";
+  });
+
+  /* ---------- reveal on scroll ---------- */
+  var revEls = Array.prototype.slice.call(document.querySelectorAll(".reveal"));
+  if("IntersectionObserver" in window && !reduce){
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(e){
+        if(e.isIntersecting){ e.target.classList.add("in"); io.unobserve(e.target); }
+      });
+    },{threshold:.12, rootMargin:"0px 0px -8% 0px"});
+    revEls.forEach(function(el){io.observe(el);});
+  } else {
+    revEls.forEach(function(el){el.classList.add("in");});
+  }
+
+  /* ---------- "reds turning green" transform viz ---------- */
+  // Each row: array of stages 0..4 confidence per week; we render 5 cells that
+  // fill green over weeks. We animate the "week" pointer when it scrolls in.
+  var RED="#FF5F6D", AMBER="#FFB84D", GREEN="#3ec98a", DIM="rgba(255,255,255,.06)";
+  // per-row: how many weeks until it goes green (staggered)
+  var rowSpeed=[1,2,2,3,4];
+  var tvTrack=document.getElementById("tvTrack");
+  var tvWeek=document.getElementById("tvWeek");
+  var CELLS=5;
+  function colorFor(rowIdx, week){
+    // progress: at week w, cell shows red->amber->green as w passes threshold
+    var speed=rowSpeed[rowIdx];
+    // fraction of "done"
+    var done = Math.min(week/ (speed+1), 1);
+    if(done<=0.01) return RED;
+    if(done<0.6) return AMBER;
+    return GREEN;
+  }
+  function renderViz(week){
+    if(!tvTrack) return;
+    var rows=tvTrack.querySelectorAll(".tv-cells");
+    rows.forEach(function(rowEl, ri){
+      var cells=rowEl.children;
+      for(var c=0;c<CELLS;c++){
+        var cell=cells[c];
+        if(!cell) continue;
+        // cell c represents week c+1; light up to current week
+        if(c < week){
+          cell.style.background = colorFor(ri, c+1);
+          cell.style.boxShadow = "0 0 10px "+colorFor(ri,c+1)+"55";
+        } else {
+          cell.style.background = DIM;
+          cell.style.boxShadow = "none";
+        }
+      }
+    });
+    if(tvWeek) tvWeek.textContent = "Week "+Math.max(1,week);
+  }
+  // build cells
+  if(tvTrack){
+    tvTrack.querySelectorAll(".tv-cells").forEach(function(rowEl){
+      for(var c=0;c<CELLS;c++){
+        var d=document.createElement("div");
+        d.className="tv-cell";
+        d.style.background=DIM;
+        rowEl.appendChild(d);
+      }
+    });
+    renderViz(reduce?5:1);
+    if(!reduce){
+      var vizStarted=false;
+      var vizObs=new IntersectionObserver(function(entries){
+        entries.forEach(function(e){
+          if(e.isIntersecting && !vizStarted){
+            vizStarted=true;
+            var w=1;
+            renderViz(w);
+            var iv=setInterval(function(){
+              w++;
+              renderViz(w);
+              if(w>=CELLS){ clearInterval(iv); }
+            },900);
+          }
+        });
+      },{threshold:.4});
+      var vizEl = document.getElementById("transformViz");
+      if(vizEl) vizObs.observe(vizEl);
+    }
+  }
+
+  /* ---------- scroll-driven hero heading colour shift ---------- */
+  var hero = document.querySelector(".hero h1");
+  if(hero && !reduce){
+    var ticking = false;
+    function applyScrollHue(){
+      ticking = false;
+      var doc = document.documentElement;
+      var max = (doc.scrollHeight - window.innerHeight);
+      var progress = max > 0 ? (window.scrollY || window.pageYOffset || 0) / max : 0;
+      if(progress < 0) progress = 0; else if(progress > 1) progress = 1;
+      var pos = (progress <= 0.5 ? progress * 2 : (1 - progress) * 2) * 100;
+      hero.style.setProperty("--hero-pos", pos.toFixed(2) + "%");
+    }
+    function onScroll(){
+      if(!ticking){ ticking = true; requestAnimationFrame(applyScrollHue); }
+    }
+    window.addEventListener("scroll", onScroll, {passive:true});
+    window.addEventListener("resize", onScroll, {passive:true});
+    applyScrollHue();
+  }
+
+  /* ---------- liquid-light canvas field ---------- */
+  var canvas = document.getElementById("field");
+  if(!canvas || reduce){ if(canvas) canvas.style.display="none"; return; }
+  var ctx = canvas.getContext("2d");
+  var dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+  var W=0, H=0;
+  var mobile = window.matchMedia("(max-width:760px)").matches;
+
+  var palette = [
+    [182,240,60],
+    [134,224,30],
+    [201,247,166],
+    [57,230,196],
+    [31,191,166]
+  ];
+
+  var COUNT = mobile ? 5 : 8;
+  var blobs = [];
+  function rand(a,b){return a+Math.random()*(b-a);}
+
+  function buildBlobs(){
+    blobs = [];
+    for(var i=0;i<COUNT;i++){
+      var c = palette[i % palette.length];
+      blobs.push({
+        x: rand(0,1), y: rand(0,1),
+        r: rand(0.28,0.55),
+        vx: rand(-0.00016,0.00016),
+        vy: rand(-0.00016,0.00016),
+        ph: rand(0,Math.PI*2),
+        sp: rand(0.15,0.4),
+        col: c
+      });
+    }
+  }
+
+  function resize(){
+    W = window.innerWidth;
+    H = window.innerHeight;
+    canvas.style.width = W + "px";
+    canvas.style.height = H + "px";
+    canvas.width = Math.floor(W*dpr);
+    canvas.height = Math.floor(H*dpr);
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+  }
+  resize();
+  buildBlobs();
+
+  var mx=0.5, my=0.4, tmx=0.5, tmy=0.4;
+  window.addEventListener("mousemove", function(e){
+    tmx = e.clientX/window.innerWidth;
+    tmy = e.clientY/window.innerHeight;
+  }, {passive:true});
+  window.addEventListener("touchmove", function(e){
+    if(e.touches && e.touches[0]){
+      tmx = e.touches[0].clientX/window.innerWidth;
+      tmy = e.touches[0].clientY/window.innerHeight;
+    }
+  }, {passive:true});
+
+  var t=0, tabVisible=true, heroOnScreen=true, rafId=null;
+  function running(){ return tabVisible && heroOnScreen; }
+  function kick(){ if(running() && rafId===null) rafId = requestAnimationFrame(draw); } // resume without stacking
+  window.addEventListener("resize", function(){ resize(); });
+  document.addEventListener("visibilitychange", function(){
+    tabVisible = !document.hidden;
+    kick();
+  });
+  // stop drawing once the (fixed, full-screen) canvas is scrolled past — saves CPU/battery on long pages
+  if("IntersectionObserver" in window){
+    var heroWatch = document.querySelector(".hero") || canvas;
+    if(heroWatch){
+      new IntersectionObserver(function(entries){
+        heroOnScreen = entries[0].isIntersecting;
+        kick();
+      },{threshold:0}).observe(heroWatch);
+    }
+  }
+
+  function draw(){
+    rafId = null;
+    if(!running()) return;
+    t += 0.006;
+    mx += (tmx-mx)*0.05;
+    my += (tmy-my)*0.05;
+
+    ctx.globalCompositeOperation = "source-over";
+    ctx.fillStyle = "#0D0E12";
+    ctx.fillRect(0,0,W,H);
+
+    ctx.globalCompositeOperation = "lighter";
+    var pull = 0.10;
+    for(var i=0;i<blobs.length;i++){
+      var b = blobs[i];
+      b.x += b.vx; b.y += b.vy;
+      if(b.x<-0.3)b.x=1.3; if(b.x>1.3)b.x=-0.3;
+      if(b.y<-0.3)b.y=1.3; if(b.y>1.3)b.y=-0.3;
+
+      var ox = Math.sin(t*b.sp + b.ph)*0.10;
+      var oy = Math.cos(t*b.sp*1.1 + b.ph)*0.10;
+      var cx = (b.x+ox)*(1-pull) + mx*pull;
+      var cy = (b.y+oy)*(1-pull) + my*pull;
+
+      var px = cx*W, py = cy*H;
+      var rad = b.r * Math.min(W,H) * (0.9 + 0.12*Math.sin(t*0.7+b.ph));
+      var g = ctx.createRadialGradient(px,py,0,px,py,rad);
+      var c = b.col;
+      g.addColorStop(0, "rgba("+c[0]+","+c[1]+","+c[2]+",0.42)");
+      g.addColorStop(0.45,"rgba("+c[0]+","+c[1]+","+c[2]+",0.16)");
+      g.addColorStop(1, "rgba("+c[0]+","+c[1]+","+c[2]+",0)");
+      ctx.fillStyle = g;
+      ctx.beginPath();
+      ctx.arc(px,py,rad,0,Math.PI*2);
+      ctx.fill();
+    }
+
+    ctx.globalCompositeOperation = "source-over";
+    ctx.fillStyle = "rgba(13,14,18,0.30)";
+    ctx.fillRect(0,0,W,H);
+
+    rafId = requestAnimationFrame(draw);
+  }
+  rafId = requestAnimationFrame(draw);
+})();
+</script>
+
+<div class="subj-modal" id="subjModal" aria-hidden="true">
+  <div class="subj-modal-backdrop" data-close></div>
+  <div class="subj-modal-box" role="dialog" aria-modal="true" aria-labelledby="smTitle">
+    <button class="subj-modal-x" data-close aria-label="Close">&times;</button>
+    <div id="smBody"></div>
+  </div>
+</div>
+</body>
+</html>
